@@ -1,0 +1,2 @@
+/* Compatibility wrapper. New code should import global.css through index.css. */
+@import './global.css';

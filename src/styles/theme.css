@@ -1,0 +1,2 @@
+/* Compatibility wrapper. New code should import tokens.css through index.css. */
+@import './tokens.css';
