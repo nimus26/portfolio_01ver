@@ -1,4 +1,5 @@
 import "./AboutMe.css";
+import canvasFront from "../../asset/canvas_front_cut.png";
 
 const capabilities = [
   { name: "React", type: "Component Structure" },
@@ -14,9 +15,17 @@ const workingFocus = [
   { order: "04", event: "Prepare handoff-ready UI foundations", place: "Design tokens, reusable patterns, documentation" },
 ];
 
-export function AboutMe() {
+type AboutMeProps = {
+  showDockedCanvas?: boolean;
+};
+
+export function AboutMe({ showDockedCanvas = false }: AboutMeProps) {
   return (
     <section id="room-01-about" className="gallery-room about-section">
+
+      <div className={`about-profile-target${showDockedCanvas ? " is-docked" : ""}`} aria-hidden="true">
+        <img className="about-profile-target__image" src={canvasFront} alt="" />
+      </div>
 
       <header className="about-header">
         <div className="about-label-row">
@@ -78,3 +87,4 @@ export function AboutMe() {
     </section>
   );
 }
+

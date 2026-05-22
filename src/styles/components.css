@@ -17,6 +17,39 @@
 @keyframes wc-svg-030   { from { opacity: 0; } to { opacity: 0.30; } }
 @keyframes wc-svg-020   { from { opacity: 0; } to { opacity: 0.20; } }
 
+@keyframes canvas-flip-back {
+  0%, 12% { opacity: 1; }
+  22%, 100% { opacity: 0; }
+}
+
+@keyframes canvas-flip-turn-45 {
+  0%, 12% { opacity: 0; }
+  20%, 30% { opacity: 1; }
+  38%, 100% { opacity: 0; }
+}
+
+@keyframes canvas-flip-turn-85 {
+  0%, 30% { opacity: 0; }
+  38%, 48% { opacity: 1; }
+  56%, 100% { opacity: 0; }
+}
+
+@keyframes canvas-flip-front-125 {
+  0%, 46% { opacity: 0; }
+  54%, 64% { opacity: 1; }
+  72%, 100% { opacity: 0; }
+}
+
+@keyframes canvas-flip-front-180 {
+  0%, 62% { opacity: 0; }
+  70%, 82% { opacity: 1; }
+  90%, 100% { opacity: 0; }
+}
+
+@keyframes canvas-flip-front {
+  0%, 82% { opacity: 0; }
+  94%, 100% { opacity: 1; }
+}
 
 /* --------------------------------------------------------------------------
    MUSEUM NAVBAR
@@ -208,13 +241,139 @@
   position: relative;
   width: min(80vw, 920px);
   aspect-ratio: 920 / 620;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  transition: opacity 0.5s ease, transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.canvas-frame-svg {
+.canvas-frame-stack,
+.canvas-frame-layer,
+.canvas-flip-card,
+.canvas-flip-card__face {
+  position: absolute;
+  inset: 0;
+}
+
+.canvas-frame-stack {
+  z-index: 1;
+  transform-style: preserve-3d;
+}
+
+.canvas-frame-layer {
+  opacity: 0;
+  transition: opacity 0.64s ease;
+}
+
+.canvas-frame-layer.is-active {
+  opacity: 1;
+}
+
+.canvas-frame-svg,
+.canvas-frame-image,
+.canvas-flip-card__face {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+.canvas-frame-image {
+  object-fit: contain;
+  transform-origin: center center;
+}
+
+.canvas-frame-svg {
   overflow: visible;
+}
+
+.canvas-flip-card {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateZ(0);
+  transition:
+    opacity 0.24s ease,
+    transform 0.86s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.canvas-flip-card.is-flipped {
+  opacity: 1;
+  transform: translateZ(0);
+}
+.canvas-flip-card.is-front-locked {
+  opacity: 1;
+  transform: translateZ(0);
+}
+
+.canvas-flip-card.is-front-locked .canvas-flip-card__face {
+  animation: none;
+  opacity: 0;
+}
+
+.canvas-flip-card.is-front-locked .canvas-flip-card__face--front {
+  opacity: 1;
+}
+
+.canvas-flip-card.is-flipped.is-reversing .canvas-flip-card__face {
+  animation-direction: reverse;
+}
+
+.canvas-flip-card__face {
+  object-fit: contain;
+  opacity: 0;
+}
+
+.canvas-flip-card__face--back {
+  opacity: 1;
+}
+
+.canvas-flip-card.is-flipped .canvas-flip-card__face--back {
+  animation: canvas-flip-back 1s var(--ease-museum) both;
+}
+
+.canvas-flip-card.is-flipped .canvas-flip-card__face--turn-85 {
+  animation: canvas-flip-turn-85 1s var(--ease-museum) both;
+}
+
+.canvas-flip-card.is-flipped .canvas-flip-card__face--front-125 {
+  animation: canvas-flip-front-125 1s var(--ease-museum) both;
+}
+
+.canvas-flip-card.is-flipped .canvas-flip-card__face--front-180 {
+  animation: canvas-flip-front-180 1s var(--ease-museum) both;
+}
+
+.canvas-flip-card.is-flipped .canvas-flip-card__face--turn-45 {
+  animation: canvas-flip-turn-45 1s var(--ease-museum) both;
+}
+
+.canvas-flip-card.is-flipped .canvas-flip-card__face--front {
+  animation: canvas-flip-front 1s var(--ease-museum) both;
+}
+
+.canvas-frame-wrapper--flipping,
+.canvas-frame-wrapper--docked {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 40;
+  width: min(80vw, 920px);
+  opacity: var(--hero-morph-opacity, 1);
+  pointer-events: none;
+  transform:
+    translate3d(
+      calc(-50% + var(--hero-morph-x, 0px)),
+      calc(-50% + var(--hero-morph-y, 0px)),
+      0
+    )
+    rotate(var(--hero-morph-rotate, 0deg))
+    scale(var(--hero-morph-scale, 1));
+  transform-origin: center center;
+  will-change: transform, opacity, border-radius;
+}
+
+.canvas-frame-wrapper--flipping .canvas-frame-stack,
+.canvas-frame-wrapper--docked .canvas-frame-stack {
+  overflow: hidden;
+  border-radius: var(--hero-morph-radius, 0px);
 }
 
 /* Frame SVG groups: sequential reveal. */
@@ -232,11 +391,24 @@
 .canvas-text-layer {
   position: absolute;
   inset: 0;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  transition: opacity var(--duration-base) ease;
+}
+
+.canvas-frame-wrapper--wire .canvas-text-layer,
+.canvas-frame-wrapper--back .canvas-text-layer,
+.canvas-frame-wrapper--flipping .canvas-text-layer,
+.canvas-frame-wrapper--docked .canvas-text-layer,
+.canvas-frame-wrapper--wire .canvas-coord,
+.canvas-frame-wrapper--back .canvas-coord,
+.canvas-frame-wrapper--flipping .canvas-coord,
+.canvas-frame-wrapper--docked .canvas-coord {
+  opacity: 0;
 }
 
 .canvas-room-label {
@@ -304,6 +476,7 @@
 /* Coordinate labels: BAR(44)/H(620)*100+1.5=8.6% / BAR(44)/W(920)*100+1=5.8%. */
 .canvas-coord {
   position: absolute;
+  z-index: 3;
   font-family: var(--font-sans);
   font-size: 7.5px;
   letter-spacing: 0.2em;
@@ -935,4 +1108,22 @@
     display: none;
   }
 
+}
+
+
+
+
+
+
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas-frame-wrapper,
+  .canvas-flip-card,
+  .canvas-frame-layer {
+    transition: none;
+  }
+
+  .canvas-flip-card.is-flipped .canvas-flip-card__face {
+    animation-duration: 0.01ms;
+  }
 }
