@@ -1,12 +1,20 @@
 .pamphlet-card {
   position: relative;
+  width: 80%;
+  margin-inline: auto;
   cursor: pointer;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.pamphlet-card:hover,
+.pamphlet-card:focus-visible,
+.pamphlet-card.is-opening {
+  z-index: 2;
 }
 
 .pamphlet-card__stage {
   position: relative;
-  aspect-ratio: 740 / 1300;
+  aspect-ratio: 740 / 1360;
 }
 
 .pamphlet-card__image {
@@ -16,11 +24,10 @@
 
 .pamphlet-card__image--back {
   position: absolute;
-  inset: 0;
+  top: 0;
+  inset-inline: 0;
   z-index: 0;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .pamphlet-card__sheet {
@@ -29,22 +36,65 @@
   left: 7.5%;
   right: 7.5%;
   z-index: 10;
-  perspective: 800px;
+  perspective: 1100px;
 }
 
 .pamphlet-card__sheet-inner {
-  transform-origin: top center;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.pamphlet-card__page-under {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  opacity: 0;
+  background: #fffdfa;
+  box-shadow: 0 8px 22px rgba(17, 17, 17, 0.12);
+  transform-origin: center center;
+  transition: opacity 0.42s ease;
+}
+
+.pamphlet-card__page-under.is-visible {
+  opacity: 1;
+  }
+
+.pamphlet-card__page-under.is-before-unfold {
+  scale: 0.8;
+}
+
+.pamphlet-card__cover {
+  position: relative;
+  z-index: 2;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+}
+
+.pamphlet-card__page-back {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  background:
+    linear-gradient(90deg, rgba(17, 17, 17, 0.12), rgba(250, 250, 246, 0.96) 12%, rgba(255, 255, 252, 0.98));
+  box-shadow: 10px 0 24px rgba(17, 17, 17, 0.16);
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
 }
 
 .pamphlet-card__image--pamphlet {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
+  backface-visibility: hidden;
 }
 
 .pamphlet-card__image--front {
   position: absolute;
   inset-inline: 0;
-  bottom: 0;
+  top: 0;
   z-index: 20;
   width: 100%;
 }
@@ -56,11 +106,13 @@
   margin: 0 var(--grid-margin);
   background: var(--color-border);
   border-top: var(--border-default);
-  border-bottom: var(--border-default);
+  overflow: visible;
 }
 
 .catalogue-card-grid__cell {
+  position: relative;
   background: var(--color-bg);
+  overflow: visible;
 }
 
 @media (max-width: 960px) {

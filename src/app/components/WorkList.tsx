@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
 import { PROJECTS, type Project } from "../data/projects";
@@ -8,10 +8,10 @@ import pamphletJuhap       from "../../asset/pamphlet_juhap.png";
 import pamphletKia         from "../../asset/pamphlet_kia.png";
 import pamphletLotte       from "../../asset/pamphlet_lotte.png";
 import pamphletPolzzack    from "../../asset/pamphlet_polzzack.png";
-import pocketJuhap         from "../../asset/pocket_juhap.png";
-import pocketKia           from "../../asset/pocket_kia.png";
-import pocketLotte         from "../../asset/pocket_lotte.png";
-import pocketPolzzack      from "../../asset/pocket_polzzack.png";
+import pocketJuhap         from "../../asset/pocket_test.png";
+import pocketKia           from "../../asset/pocket_test.png";
+import pocketLotte         from "../../asset/pocket_test.png";
+import pocketPolzzack      from "../../asset/pocket_test.png";
 import pocketJuhapFront    from "../../asset/pocket_juhap_front.png";
 import pocketKiaFront      from "../../asset/pocket_kia_front.png";
 import pocketLotteFront    from "../../asset/pocket_lotte_front.png";
@@ -24,32 +24,57 @@ const PROJECT_IMAGES: Record<string, { back: string; pamphlet: string; front: st
   "04": { back: pocketPolzzack, pamphlet: pamphletPolzzack, front: pocketPolzzackFront },
 };
 
-const COMPACT_H = 350; // default (tucked) container height in px
-const TUCK_Y    = "55%"; // pamphlet translateY when tucked
-const REVEAL_Y  = "3%";  // pamphlet translateY when revealed
+const RESTING_Y = 12;
+const HOVER_Y = -42;
+const ENTER_Y = -132;
 
 function PamphletCard({ project }: { project: Project }) {
   const [hovered, setHovered] = useState(false);
+  const [opening, setOpening] = useState(false);
+  const [unfolding, setUnfolding] = useState(false);
+  const unfoldTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const navigateTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
   const navigate = useNavigate();
   const imgs = PROJECT_IMAGES[project.id];
+  const isActive = hovered || opening;
+
+  useEffect(() => {
+    return () => {
+      if (unfoldTimerRef.current) window.clearTimeout(unfoldTimerRef.current);
+      if (navigateTimerRef.current) window.clearTimeout(navigateTimerRef.current);
+    };
+  }, []);
+
+  const openProject = () => {
+    if (opening) return;
+
+    setHovered(true);
+    setOpening(true);
+    setUnfolding(false);
+
+    unfoldTimerRef.current = window.setTimeout(() => setUnfolding(true), 320);
+    navigateTimerRef.current = window.setTimeout(() => navigate(`/project/${project.id}`), 980);
+  };
 
   return (
     <motion.div
-      className="pamphlet-card"
-      animate={{ height: hovered ? "auto" : COMPACT_H }}
-      transition={{ type: "spring", damping: 28, stiffness: 200 }}
+      className={`pamphlet-card${opening ? " is-opening" : ""}`}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseLeave={() => {
+        if (!opening) setHovered(false);
+      }}
       onFocus={() => setHovered(true)}
-      onBlur={() => setHovered(false)}
-      onClick={() => navigate(`/project/${project.id}`)}
+      onBlur={() => {
+        if (!opening) setHovered(false);
+      }}
+      onClick={openProject}
       role="button"
       tabIndex={0}
       aria-label={`Enter ${project.title} exhibition`}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          navigate(`/project/${project.id}`);
+          openProject();
         }
       }}
     >
@@ -65,21 +90,32 @@ function PamphletCard({ project }: { project: Project }) {
 
         <motion.div
           className="pamphlet-card__sheet"
-          animate={{ y: hovered ? REVEAL_Y : TUCK_Y }}
+          animate={{ y: opening ? ENTER_Y : isActive ? HOVER_Y : RESTING_Y }}
           transition={{ type: "spring", damping: 30, stiffness: 220 }}
         >
-          <motion.div
-            className="pamphlet-card__sheet-inner"
-            animate={{ rotateX: hovered ? 0 : 12 }}
-            transition={{ type: "spring", damping: 22, stiffness: 160 }}
-          >
-            <img
-              src={imgs.pamphlet}
-              alt={project.title}
-              draggable={false}
-              className="pamphlet-card__image pamphlet-card__image--pamphlet"
+          <div className="pamphlet-card__sheet-inner">
+            <span
+              className={[
+                "pamphlet-card__page-under",
+                opening ? "is-visible" : "",
+                opening && !unfolding ? "is-before-unfold" : "",
+              ].filter(Boolean).join(" ")}
+              aria-hidden="true"
             />
-          </motion.div>
+            <motion.div
+              className="pamphlet-card__cover"
+              animate={{ rotateY: unfolding ? -148 : 0 }}
+              transition={{ duration: unfolding ? 0.58 : 0.24, ease: [0.25, 1, 0.5, 1] }}
+            >
+              <span className="pamphlet-card__page-back" aria-hidden="true" />
+              <img
+                src={imgs.pamphlet}
+                alt={project.title}
+                draggable={false}
+                className="pamphlet-card__image pamphlet-card__image--pamphlet"
+              />
+            </motion.div>
+          </div>
         </motion.div>
 
         <img
@@ -110,7 +146,7 @@ export function WorkList() {
             Exhibition<br /><em>Catalogue</em>
           </h2>
           <p className="catalogue-description">
-            Hover or focus to reveal. Select a project to open the case study.
+            Hover or focus to lift the booklet. Select a project to open the case study.
           </p>
         </div>
       </header>

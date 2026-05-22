@@ -1,51 +1,16 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router";
-import { PROJECTS, type MarkType, type Project } from "../data/projects";
+import { PROJECTS, type Project } from "../data/projects";
 import "./Gallery3D.css";
-
-const wallVariants = {
-  enter: (dir: number) => ({
-    rotateY: dir > 0 ? -72 : 72,
-    opacity: 0,
-    scale: 0.96,
-  }),
-  center: {
-    rotateY: 0,
-    opacity: 1,
-    scale: 1,
-    transition: { type: "spring" as const, damping: 30, stiffness: 160 },
-  },
-  exit: (dir: number) => ({
-    rotateY: dir > 0 ? 72 : -72,
-    opacity: 0,
-    scale: 0.96,
-    transition: { duration: 0.32, ease: [0.25, 1, 0.5, 1] as [number, number, number, number] },
-  }),
-};
 
 function WallLabel({ children }: { children: ReactNode }) {
   return <p className="gallery-wall-label">{children}</p>;
 }
 
-function WireframeHero({ mark }: { mark: MarkType }) {
+function WireframeHero() {
   return (
     <div className="wireframe-hero" aria-label="Project visual archive placeholder">
-      <svg className="wireframe-hero__grid" preserveAspectRatio="none" viewBox="0 0 160 65" aria-hidden="true">
-        {[20, 40, 60, 80, 100, 120, 140].map((x) => (
-          <line key={x} x1={x} y1="0" x2={x} y2="65" stroke="#111111" strokeWidth="0.5" />
-        ))}
-        {[16, 32, 49].map((y) => (
-          <line key={y} x1="0" y1={y} x2="160" y2={y} stroke="#111111" strokeWidth="0.5" />
-        ))}
-        {mark === "canvas" && (
-          <>
-            <rect x="60" y="20" width="40" height="25" fill="none" stroke="#111111" strokeWidth="0.6" opacity="0.2" />
-            <line x1="60" y1="32.5" x2="100" y2="32.5" stroke="#111111" strokeWidth="0.4" opacity="0.15" />
-            <line x1="80" y1="20" x2="80" y2="45" stroke="#111111" strokeWidth="0.4" opacity="0.15" />
-          </>
-        )}
-      </svg>
       <span className="wireframe-hero__label">Visual Archive - Coming Soon</span>
     </div>
   );
@@ -81,7 +46,7 @@ function Wall1({ p }: { p: Project }) {
         transition={{ delay: 0.3, type: "spring", damping: 28, stiffness: 180 }}
         className="gallery-wall__hero"
       >
-        <WireframeHero mark={p.mark} />
+        <WireframeHero />
       </motion.div>
 
       <motion.div
@@ -252,6 +217,8 @@ function Wall4({ p, onExit }: { p: Project; onExit: () => void }) {
 }
 
 const WALLS = ["Vision", "Process", "Problem / SAR", "Outcome"] as const;
+const cubeFaces = ["front", "right", "back", "left"] as const;
+const maxScrollIndex = WALLS.length - 1;
 
 export function Gallery3D() {
   const { id } = useParams<{ id: string }>();
@@ -259,11 +226,23 @@ export function Gallery3D() {
   const project = PROJECTS.find((p) => p.id === id);
 
   const [wallIndex, setWallIndex] = useState(0);
-  const dirRef = useRef(1);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const go = (nextIndex: number) => {
-    dirRef.current = nextIndex > wallIndex ? 1 : -1;
-    setWallIndex(Math.max(0, Math.min(WALLS.length - 1, nextIndex)));
+    const targetIndex = Math.max(0, Math.min(maxScrollIndex, nextIndex));
+    const scroller = scrollRef.current;
+
+    if (!scroller) {
+      setWallIndex(targetIndex);
+      setScrollProgress(targetIndex);
+      return;
+    }
+
+    scroller.scrollTo({
+      top: targetIndex * scroller.clientHeight,
+      behavior: "smooth",
+    });
   };
 
   const prev = () => go(wallIndex - 1);
@@ -280,6 +259,15 @@ export function Gallery3D() {
     return () => window.removeEventListener("keydown", onKey);
   }, [wallIndex, navigate]);
 
+  const handleScroll = () => {
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+
+    const progress = Math.min(maxScrollIndex, Math.max(0, scroller.scrollTop / scroller.clientHeight));
+    setScrollProgress(progress);
+    setWallIndex(Math.round(progress));
+  };
+
   if (!project) {
     return (
       <div className="gallery-not-found">
@@ -289,7 +277,12 @@ export function Gallery3D() {
   }
 
   return (
-    <div className="gallery-3d">
+    <motion.div
+      className="gallery-3d"
+      initial={{ opacity: 0, scale: 0.985 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.42, ease: [0.25, 1, 0.5, 1] }}
+    >
       <div className="gallery-topbar">
         <div className="gallery-topbar__left">
           <button type="button" onClick={() => navigate("/")} className="gallery-breadcrumb-button">
@@ -308,10 +301,7 @@ export function Gallery3D() {
               <button
                 key={wall}
                 type="button"
-                onClick={() => {
-                  dirRef.current = index > wallIndex ? 1 : -1;
-                  setWallIndex(index);
-                }}
+                onClick={() => go(index)}
                 className={`gallery-wall-dot${index === wallIndex ? " is-active" : ""}`}
                 aria-label={`Go to ${wall}`}
                 aria-current={index === wallIndex ? "step" : undefined}
@@ -333,32 +323,55 @@ export function Gallery3D() {
       </div>
 
       <div className="gallery-stage">
-        <AnimatePresence custom={dirRef.current} mode="wait">
-          <motion.div
-            key={wallIndex}
-            custom={dirRef.current}
-            variants={wallVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            className="gallery-stage__wall"
-          >
-            <div className="gallery-stage__floor-line" aria-hidden="true" />
+        <div className="gallery-face-caption" aria-hidden="true">
+          <span className="gallery-face-caption__number">
+            {String(wallIndex + 1).padStart(2, "0")}
+          </span>
+          <span className="gallery-face-caption__name">{WALLS[wallIndex]}</span>
+        </div>
 
-            {wallIndex === 0 && <Wall1 p={project} />}
-            {wallIndex === 1 && <Wall2 p={project} />}
-            {wallIndex === 2 && <Wall3 p={project} />}
-            {wallIndex === 3 && <Wall4 p={project} onExit={() => navigate("/")} />}
+        <div className="gallery-cube-scene">
+          <motion.div
+            className="gallery-cube"
+            animate={{
+              rotateY: -scrollProgress * 90,
+              z: Math.sin(scrollProgress * Math.PI) * 24,
+            }}
+            transition={{ type: "spring", damping: 36, stiffness: 150 }}
+          >
+            {cubeFaces.map((face, index) => (
+              <section
+                key={face}
+                className={`gallery-cube__face gallery-cube__face--${face}`}
+                aria-hidden={index !== wallIndex}
+              >
+                {index === 0 && <Wall1 p={project} />}
+                {index === 1 && <Wall2 p={project} />}
+                {index === 2 && <Wall3 p={project} />}
+                {index === 3 && <Wall4 p={project} onExit={() => navigate("/")} />}
+              </section>
+            ))}
           </motion.div>
-        </AnimatePresence>
+        </div>
       </div>
 
       <div className="gallery-bottombar">
         <span>
           Wall {wallIndex + 1} - {WALLS[wallIndex]}
         </span>
-        <span>Arrow keys to navigate - Esc to exit</span>
+        <span>Scroll to move through the room - Esc to exit</span>
       </div>
-    </div>
+
+      <div
+        ref={scrollRef}
+        className="gallery-scroll-driver"
+        onScroll={handleScroll}
+        aria-label="Project section scroll"
+      >
+        {WALLS.map((wall, index) => (
+          <section key={wall} className="gallery-scroll-section" aria-label={`${index + 1}. ${wall}`} />
+        ))}
+      </div>
+    </motion.div>
   );
 }
