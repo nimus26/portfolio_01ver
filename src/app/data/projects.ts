@@ -7,12 +7,12 @@ export const PROJECTS = [
     year: "2023",
     role: "UI/UX Designer & Front-end Developer",
     mark: "canvas" as const,
-    metricNote: "TODO: Verify measurement sources before publishing.",
-    result: "Reported onboarding improvement from 52% to 84%; download and retention metrics need source verification.",
+    metricNote: "Metrics pending until verified project data is added.",
+    result: "Result summary pending. Add only verified outcomes before publishing.",
     achievements: [
-      { value: "4.8", label: "Rating - verify source" },
-      { value: "12K+", label: "Downloads - verify" },
-      { value: "+38%", label: "Retention - verify" },
+      { value: "TBD", label: "Primary Metric" },
+      { value: "TBD", label: "User Outcome" },
+      { value: "TBD", label: "Business Impact" },
     ],
     summary:
       "A data-driven mobile application pairing Korean traditional alcohol with food, driven by a custom recommendation engine and sensory-mapped flavor profiles.",
@@ -28,14 +28,14 @@ export const PROJECTS = [
     ],
     sar: [
       {
-        s: "Flavor data was unstructured and inconsistent across multiple sources",
-        a: "Defined a normalized sensory taxonomy; built an admin tagging tool for ongoing curation",
-        r: "Data prep time reportedly decreased by 60%; source verification needed before publishing",
+        s: "Problem statement pending. Describe the user or product issue with concrete context.",
+        a: "Action pending. Explain the design or implementation decision you personally owned.",
+        r: "Result pending. Add verified qualitative or quantitative outcome.",
       },
       {
-        s: "First-time users dropped at the 7-step onboarding preference screen",
-        a: "Redesigned as a swipe-card tasting game, reducing steps from 7 to 3",
-        r: "Onboarding completion reportedly improved from 52% to 84%; source verification needed",
+        s: "Constraint pending. Note timeline, team, technical, or legacy limitations.",
+        a: "Execution pending. Summarize how you handled the constraint.",
+        r: "Learning pending. Capture what improved or what you would change next.",
       },
     ],
     reflection:
@@ -49,12 +49,12 @@ export const PROJECTS = [
     year: "2023",
     role: "Interaction Designer",
     mark: "weave" as const,
-    metricNote: "TODO: Verify measurement sources before publishing.",
-    result: "Reported LCP improvement from 5.8s to 2.1s; engagement and accessibility claims need source verification.",
+    metricNote: "Metrics pending until verified project data is added.",
+    result: "Result summary pending. Add only verified outcomes before publishing.",
     achievements: [
-      { value: "2.1s", label: "LCP" },
-      { value: "+22%", label: "Engagement - verify" },
-      { value: "AA", label: "WCAG - verify" },
+      { value: "TBD", label: "Performance" },
+      { value: "TBD", label: "Engagement" },
+      { value: "TBD", label: "Accessibility" },
     ],
     summary:
       "Global website renewal for KIA Motors USA, focused on performance, responsive information architecture, and configurator interaction design.",
@@ -70,14 +70,14 @@ export const PROJECTS = [
     ],
     sar: [
       {
-        s: "3D configurator caused 5.8s LCP on mid-range mobile devices",
-        a: "Implemented progressive mesh loading and deferred Three.js initialization until viewport entry",
-        r: "LCP reportedly improved from 5.8s to 2.1s; configurator start-rate source needs verification",
+        s: "Problem statement pending. Describe the UX, performance, or content challenge.",
+        a: "Action pending. Explain the interaction, layout, or technical decision you owned.",
+        r: "Result pending. Add verified measurement, review feedback, or before/after evidence.",
       },
       {
-        s: "Navigation patterns diverged across breakpoints, failing usability benchmarks",
-        a: "Unified IA under a single component system, tested across 5 breakpoints with 30 participants",
-        r: "Task completion reportedly improved by 31% in moderated sessions; source verification needed",
+        s: "Constraint pending. Note responsive, stakeholder, asset, or technical limitations.",
+        a: "Execution pending. Summarize how the flow or component system changed.",
+        r: "Learning pending. Capture the strongest portfolio takeaway.",
       },
     ],
     reflection:
@@ -91,12 +91,12 @@ export const PROJECTS = [
     year: "2024",
     role: "UX Designer (Solo)",
     mark: "grid" as const,
-    metricNote: "TODO: Verify measurement sources before publishing.",
-    result: "Reported error reduction, task-success, and NPS improvements need source verification before publishing.",
+    metricNote: "Metrics pending until verified project data is added.",
+    result: "Result summary pending. Add only verified outcomes before publishing.",
     achievements: [
-      { value: "-34%", label: "Error Rate - verify" },
-      { value: "91%", label: "Task Success - verify" },
-      { value: "+8pt", label: "NPS - verify" },
+      { value: "TBD", label: "Task Success" },
+      { value: "TBD", label: "Error Reduction" },
+      { value: "TBD", label: "User Feedback" },
     ],
     summary:
       "Focused UX audit and redesign of the Lotte Card payment and benefits dashboard, prioritizing information hierarchy, error prevention, and typographic consistency.",
@@ -112,14 +112,14 @@ export const PROJECTS = [
     ],
     sar: [
       {
-        s: "Payment confirmation had a 12% error rate from ambiguous CTA placement",
-        a: "Restructured visual hierarchy; added a confirmation gate for destructive actions",
-        r: "Error-rate and support-ticket reductions are draft metrics; source verification needed",
+        s: "Problem statement pending. Describe the task flow or information hierarchy issue.",
+        a: "Action pending. Explain the redesign or prototype decision you owned.",
+        r: "Result pending. Add verified testing, review, or comparison evidence.",
       },
       {
-        s: "Benefit tiles ignored by 68% of users in an eye-tracking study",
-        a: "Redesigned with progressive disclosure so top benefits surfaced contextually per card usage",
-        r: "Benefit engagement improvement is a draft metric; source verification needed",
+        s: "Constraint pending. Note legacy UI, scope, or brand-system limitations.",
+        a: "Execution pending. Summarize how you balanced constraint and clarity.",
+        r: "Learning pending. Capture the decision-making value for reviewers.",
       },
     ],
     reflection:
@@ -133,12 +133,12 @@ export const PROJECTS = [
     year: "2022",
     role: "UX Strategist & Lead Designer",
     mark: "stack" as const,
-    metricNote: "TODO: Verify measurement sources before publishing.",
-    result: "Timeline, pilot-school, usability, and stress-score claims need source verification before publishing.",
+    metricNote: "Metrics pending until verified project data is added.",
+    result: "Result summary pending. Add only verified outcomes before publishing.",
     achievements: [
-      { value: "6 mo", label: "0 to Beta - verify" },
-      { value: "3", label: "Pilot Schools - verify" },
-      { value: "#1", label: "Usability - verify" },
+      { value: "TBD", label: "Research Scope" },
+      { value: "TBD", label: "Prototype Depth" },
+      { value: "TBD", label: "Validation" },
     ],
     summary:
       "Strategic UX planning for a college application management app, covering research synthesis, information architecture, and a high-fidelity prototype.",
@@ -154,14 +154,14 @@ export const PROJECTS = [
     ],
     sar: [
       {
-        s: "Students reported overwhelm from simultaneous deadlines across multiple schools",
-        a: "Designed a priority-weighted timeline that surfaced the 3 most critical tasks each day",
-        r: "Perceived stress-score improvement is a draft metric; source verification needed",
+        s: "Problem statement pending. Describe the user pain point with research context.",
+        a: "Action pending. Explain the planning, IA, or prototype decision you owned.",
+        r: "Result pending. Add verified user feedback or testing outcome.",
       },
       {
-        s: "Counselors and students had conflicting mental models of the application checklist",
-        a: "Conducted paired interviews; designed a dual-view with shared real-time state",
-        r: "'Intuitive' rating from both personas in 90% of test sessions",
+        s: "Constraint pending. Note research, collaboration, or product-scope limits.",
+        a: "Execution pending. Summarize how the concept was clarified.",
+        r: "Learning pending. Capture how the project strengthened your UX judgment.",
       },
     ],
     reflection:
