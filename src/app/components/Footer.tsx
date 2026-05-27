@@ -45,8 +45,8 @@ export function SiteFooter() {
       </div>
 
       <div className="site-footer__copy">
-        <span className="site-footer__copy-text">(c) 2024 Kim Sumin - Portfolio Exhibition</span>
-        <span className="site-footer__copy-text">The White Cube - Seoul, KR</span>
+        <span className="site-footer__copy-text">(c) 2026 Kim Sumin - UIUX Portfolio Exhibition</span>
+        <span className="site-footer__copy-text">Sumin Archive - Seoul, KR</span>
       </div>
     </footer>
   );

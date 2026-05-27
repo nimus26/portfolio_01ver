@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 const rooms = [
-  { id: "ROOM 00", label: "INDEX", targetId: "room-00-cover" },
-  { id: "ROOM 01", label: "ABOUT", targetId: "room-01-about" },
-  { id: "ROOM 03", label: "WORK", targetId: "room-03-catalogue" },
+  { id: "ROOM 00", label: "enterence", targetId: "room-00-cover" },
+  { id: "ROOM 01", label: "about me", targetId: "room-01-about" },
+  { id: "ROOM 02", label: "projects", targetId: "room-03-catalogue" },
 ];
 
 export function GlobalNav() {
@@ -30,8 +30,8 @@ export function GlobalNav() {
       <div className="museum-navbar__inner">
         <div className="museum-navbar__left">
           <div className="museum-navbar__brand">
-            <span className="museum-navbar__brand-label">Exhibition</span>
-            <span className="museum-navbar__brand-title">The White Cube</span>
+            <span className="museum-navbar__brand-label">Portfolio Exhibition</span>
+            <span className="museum-navbar__brand-title">Sumin Kim</span>
           </div>
 
           <div className="museum-navbar__vr" aria-hidden="true" />
@@ -58,7 +58,7 @@ export function GlobalNav() {
         </div>
 
         <div className="museum-navbar__right">
-          <span className="museum-navbar__contact-label">Contact</span>
+          <span className="museum-navbar__contact-label">연락</span>
           <div className="museum-navbar__vr" aria-hidden="true" />
           <button
             type="button"

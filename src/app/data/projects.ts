@@ -1,171 +1,266 @@
 export const PROJECTS = [
   {
     id: "01",
-    type: "Team Project",
-    title: "JUHAP",
-    subtitle: "Alcohol Pairing App",
-    year: "2023",
-    role: "UI/UX Designer & Front-end Developer",
-    mark: "canvas" as const,
-    metricNote: "Metrics pending until verified project data is added.",
-    result: "Result summary pending. Add only verified outcomes before publishing.",
+    type: "개인 프로젝트",
+    title: "롯데카드",
+    subtitle: "웹사이트 리뉴얼",
+    roomTitle: "Information Flow",
+    year: "2026.01",
+    period: "1개월",
+    role: "UX Designer / 개인 작업",
+    mark: "grid" as const,
+    evidenceStatus: "리디자인 초안과 20명 대상 설문 기반",
+    metricNote: "리뉴얼 전후 설문과 대표 피드백을 근거로 정리",
+    result: "20명 대상 설문에서 정보 접근성과 시각적 위계 개선에 대한 긍정 피드백을 확인했습니다.",
     achievements: [
-      { value: "TBD", label: "Primary Metric" },
-      { value: "TBD", label: "User Outcome" },
-      { value: "TBD", label: "Business Impact" },
+      { value: "20명", label: "설문 참여" },
+      { value: "1개월", label: "진행 기간" },
+      { value: "개인", label: "기획부터 구현" },
     ],
     summary:
-      "A data-driven mobile application pairing Korean traditional alcohol with food, driven by a custom recommendation engine and sensory-mapped flavor profiles.",
-    tech: ["React Native", "Figma", "Node.js", "PostgreSQL"],
-    techRationale:
-      "React Native ensured cross-platform parity on a constrained timeline. PostgreSQL handled the relational pairing data with complex multi-join queries across the flavor taxonomy.",
-    businessGoals:
-      "Grow awareness of Korean traditional alcohol among the 20 to 35 demographic and drive repeat sessions through personalized pairing discovery.",
+      "카드 상품과 이벤트 정보가 한 화면에서 섞여 보이는 문제를 중심으로, 사용자가 필요한 혜택과 상품 정보를 빠르게 비교할 수 있도록 정보 흐름을 재정리한 리뉴얼 프로젝트입니다.",
+    problem:
+      "기존 화면은 배너, 메뉴, 카드 상품 분류가 한꺼번에 노출되어 사용자가 어떤 정보부터 확인해야 하는지 판단하기 어려웠습니다.",
+    goal:
+      "메인 화면의 정보 우선순위를 명확히 하고, 로그인 전후 맥락과 카드 상품 탐색 흐름을 분리해 사용자가 필요한 정보를 더 빠르게 찾도록 만드는 것이 목표였습니다.",
+    myRole:
+      "문제 정의, 정보 구조 정리, 화면 설계, 리디자인 방향 설정, HTML/CSS 기반 구현까지 개인 작업으로 진행했습니다.",
+    process: [
+      "기존 메인 화면과 메뉴 구조에서 정보가 겹치거나 우선순위가 흐려지는 지점을 정리했습니다.",
+      "로그인 전후 사용자가 기대하는 정보 맥락을 나누고, 메인 배너와 카드 상품 영역의 역할을 분리했습니다.",
+      "카드 상품을 목적별로 비교할 수 있도록 생활/혜택 중심의 탐색 구조를 제안했습니다.",
+      "리디자인 초안 기준으로 20명 대상 설문을 진행해 개선 방향에 대한 피드백을 확인했습니다.",
+    ],
+    designSolution:
+      "메인 비주얼은 서비스 인상을 만드는 영역으로 두고, 이벤트와 카드 상품 정보는 별도 흐름으로 분리했습니다. 카드 선택 영역은 목적 중심 카테고리로 묶어 비교 부담을 줄였습니다.",
+    keyScreens: [
+      "메인 비주얼 영역",
+      "이벤트/혜택 안내 흐름",
+      "생활 카테고리 기반 카드 탐색",
+      "로그인 전후 정보 우선순위",
+    ],
+    confirmNeeded: [
+      "설문 문항과 결과 캡처를 첨부하면 근거 신뢰도가 높아집니다.",
+      "Before/After 화면 비교를 추가하면 개선 범위가 더 명확해집니다.",
+    ],
+    tech: ["Figma", "HTML", "CSS", "JavaScript"],
     contributions: [
-      "Architected the flavor-mapping data model and sensory taxonomy",
-      "Designed the sensory wheel interaction component",
-      "Built the recommendation feed UI end-to-end",
+      "기존 웹사이트의 정보 구조 문제를 정의했습니다.",
+      "메인 화면과 카드 탐색 영역의 역할을 분리했습니다.",
+      "리디자인 초안을 구현하고 설문 피드백으로 검토했습니다.",
     ],
     sar: [
       {
-        s: "Problem statement pending. Describe the user or product issue with concrete context.",
-        a: "Action pending. Explain the design or implementation decision you personally owned.",
-        r: "Result pending. Add verified qualitative or quantitative outcome.",
+        s: "카드 상품, 이벤트, 메뉴 정보가 동시에 노출되어 사용자가 핵심 혜택을 빠르게 파악하기 어려웠습니다.",
+        a: "메인 비주얼, 이벤트 안내, 카드 탐색 영역을 역할별로 나누고 정보 우선순위를 다시 배치했습니다.",
+        r: "20명 대상 설문에서 정보 접근성과 시각적 위계 개선에 대한 긍정 피드백을 확인했습니다.",
       },
       {
-        s: "Constraint pending. Note timeline, team, technical, or legacy limitations.",
-        a: "Execution pending. Summarize how you handled the constraint.",
-        r: "Learning pending. Capture what improved or what you would change next.",
+        s: "금융 서비스 리뉴얼은 장식적 변화보다 신뢰와 탐색 효율이 중요했습니다.",
+        a: "카드사 톤을 유지하면서도 상품 비교와 혜택 확인이 먼저 보이도록 화면 구조를 조정했습니다.",
+        r: "사용자가 정보를 읽는 순서와 비교하는 기준을 중심으로 리뉴얼 방향을 설명할 수 있게 정리했습니다.",
       },
     ],
-    reflection:
-      "Translating domain expertise from sommeliers into UI affordances taught me how to bridge knowledge gaps through design. Next iteration: deeper investment in empty-state and error-recovery design.",
+    takeaway:
+      "정보가 많은 서비스일수록 화면을 예쁘게 바꾸기보다, 사용자가 먼저 확인해야 할 판단 기준을 분명히 만드는 것이 중요하다는 점을 배웠습니다.",
   },
   {
     id: "02",
-    type: "Team Project",
-    title: "KIA USA",
-    subtitle: "Website Renewal",
-    year: "2023",
-    role: "Interaction Designer",
-    mark: "weave" as const,
-    metricNote: "Metrics pending until verified project data is added.",
-    result: "Result summary pending. Add only verified outcomes before publishing.",
+    type: "팀 프로젝트",
+    title: "주합",
+    subtitle: "주류 페어링 챗봇 앱",
+    roomTitle: "Conversational Pairing",
+    year: "2026.04-05",
+    period: "2개월",
+    role: "PM / 기획",
+    mark: "canvas" as const,
+    evidenceStatus: "리디자인 초안과 React 테스트 화면 기반",
+    metricNote: "화면별 기여 범위와 팀 역할 분리 확인 필요",
+    result: "추천 배너, 라벨 스캔, 상황별 페어링, AI 챗봇, 커뮤니티 질문으로 이어지는 탐색 흐름을 정리했습니다.",
     achievements: [
-      { value: "TBD", label: "Performance" },
-      { value: "TBD", label: "Engagement" },
-      { value: "TBD", label: "Accessibility" },
+      { value: "팀", label: "프로젝트" },
+      { value: "PM", label: "주요 역할" },
+      { value: "AI", label: "대화형 흐름" },
     ],
     summary:
-      "Global website renewal for KIA Motors USA, focused on performance, responsive information architecture, and configurator interaction design.",
-    tech: ["Next.js", "Three.js", "Figma", "Storybook"],
-    techRationale:
-      "Next.js for SSG/SSR flexibility on a content-heavy global site. Three.js for the vehicle configurator without a full WebGL framework's overhead and bundle cost.",
-    businessGoals:
-      "Reduce model-page bounce rate by 15%. Improve configurator start rate and downstream lead generation through simplified UX flows.",
+      "사용자가 술 이름이나 페어링 지식을 몰라도 음식, 분위기, 라벨 스캔, 대화형 질문을 통해 추천으로 진입할 수 있도록 설계한 주류 페어링 서비스입니다.",
+    problem:
+      "주류 선택은 이름, 맛 표현, 어울리는 음식 정보를 함께 판단해야 해서 초보 사용자가 시작점을 잡기 어렵습니다. 단순 상품 목록만으로는 사용자의 상황과 취향을 충분히 반영하기 힘들었습니다.",
+    goal:
+      "사용자가 검색어를 떠올리지 못해도 추천을 시작할 수 있도록 여러 진입점을 만들고, 각 진입점이 같은 추천 결과와 상세 정보 흐름으로 이어지게 하는 것이 목표였습니다.",
+    myRole:
+      "PM/기획 역할로 추천 진입 구조, 화면 흐름, 콘텐츠 우선순위를 정리했습니다. 포트폴리오에서는 확인 가능한 화면과 기획 범위를 중심으로 표현했습니다.",
+    process: [
+      "사용자가 술을 알고 있는 경우와 모르는 경우를 나눠 진입 경로를 정리했습니다.",
+      "AI 추천 배너, 오늘의 페어링, 라벨 스캔, 챗봇을 서로 다른 시작점으로 설계했습니다.",
+      "추천 이후에는 상세 정보, 질문, 커뮤니티로 이어지는 후속 흐름을 연결했습니다.",
+      "팀 프로젝트 특성을 고려해 개인 기여와 팀 산출물을 분리해 설명했습니다.",
+    ],
+    designSolution:
+      "첫 화면에서 기능 설명을 길게 읽게 하지 않고, 질문형 배너와 상황별 추천 카드로 바로 행동을 시작하게 했습니다. 라벨 스캔과 챗봇은 사용자의 맥락이 다른 보조 경로로 배치했습니다.",
+    keyScreens: [
+      "AI 추천 진입 배너",
+      "오늘의 페어링 배너",
+      "라벨 스캔 결과 화면",
+      "주류 상세 정보 화면",
+      "AI 챗봇 진입 화면",
+      "커뮤니티 질문 배너",
+    ],
+    confirmNeeded: [
+      "본인이 직접 담당한 화면과 팀원이 만든 화면을 추가로 분리해야 합니다.",
+      "최종 앱 스크린샷과 기획 문서 근거가 있으면 캡션 신뢰도가 높아집니다.",
+      "AI 추천이 실제 구현인지 프로토타입인지 표기를 확정해야 합니다.",
+    ],
+    tech: ["React", "Figma", "AI Chatbot", "Service Planning"],
     contributions: [
-      "Led interaction design for the 3D vehicle configurator",
-      "Defined the motion system and micro-interaction library",
-      "Conducted accessibility audit and full WCAG AA remediation",
+      "추천 진입 경로와 화면별 사용자 흐름을 정리했습니다.",
+      "상황별 추천, 라벨 스캔, 챗봇의 역할을 분리했습니다.",
+      "챗봇을 별도 기능이 아니라 추천 흐름을 보조하는 대화형 진입점으로 설명했습니다.",
     ],
     sar: [
       {
-        s: "Problem statement pending. Describe the UX, performance, or content challenge.",
-        a: "Action pending. Explain the interaction, layout, or technical decision you owned.",
-        r: "Result pending. Add verified measurement, review feedback, or before/after evidence.",
+        s: "사용자는 술 이름을 모르거나 음식에 맞는 선택 기준을 떠올리기 어려웠습니다.",
+        a: "질문형 배너, 상황별 추천, 라벨 스캔, 챗봇을 서로 다른 진입점으로 나누고 하나의 추천 흐름으로 연결했습니다.",
+        r: "기능 나열이 아니라 사용자가 시작할 수 있는 경로 중심의 케이스스터디로 정리했습니다.",
       },
       {
-        s: "Constraint pending. Note responsive, stakeholder, asset, or technical limitations.",
-        a: "Execution pending. Summarize how the flow or component system changed.",
-        r: "Learning pending. Capture the strongest portfolio takeaway.",
+        s: "팀 프로젝트 결과물을 모두 개인 기여처럼 보이게 쓰면 신뢰도가 떨어질 수 있었습니다.",
+        a: "문구를 PM/기획 범위로 제한하고, 확인되지 않은 수치나 소유권 표현은 제외했습니다.",
+        r: "추천 서비스의 구조 설계와 대화형 UX 판단을 과장 없이 보여주는 방향으로 조정했습니다.",
       },
     ],
-    reflection:
-      "Global scale sharpens performance instincts. A shared design token system from day one would have saved weeks of cross-team reconciliation on a project this size.",
+    takeaway:
+      "추천 기능은 알고리즘 자체보다 사용자가 부담 없이 시작할 수 있는 질문과 진입 경로를 설계하는 일이 중요하다는 점을 배웠습니다.",
   },
   {
     id: "03",
-    type: "Personal Project",
-    title: "LOTTE CARD",
-    subtitle: "Partial Renewal",
-    year: "2024",
-    role: "UX Designer (Solo)",
-    mark: "grid" as const,
-    metricNote: "Metrics pending until verified project data is added.",
-    result: "Result summary pending. Add only verified outcomes before publishing.",
+    type: "팀 프로젝트",
+    title: "KIA USA",
+    subtitle: "글로벌 웹사이트 리뉴얼",
+    roomTitle: "Brand Navigation",
+    year: "2026.03-04",
+    period: "1개월",
+    role: "Design Lead / 기획",
+    mark: "weave" as const,
+    evidenceStatus: "리디자인 초안과 설문 결과 기반",
+    metricNote: "17명 설문, 82.3% 긍정 선호 변화, 4개 팀 중 최우수상",
+    result: "17명 대상 설문에서 82.3%의 긍정 선호 변화가 있었고, 4개 팀 중 최우수상을 수상했습니다.",
     achievements: [
-      { value: "TBD", label: "Task Success" },
-      { value: "TBD", label: "Error Reduction" },
-      { value: "TBD", label: "User Feedback" },
+      { value: "82.3%", label: "긍정 선호 변화" },
+      { value: "17명", label: "설문 참여" },
+      { value: "최우수", label: "4개 팀 평가" },
     ],
     summary:
-      "Focused UX audit and redesign of the Lotte Card payment and benefits dashboard, prioritizing information hierarchy, error prevention, and typographic consistency.",
-    tech: ["Figma", "Principle", "HTML/CSS", "Notion"],
-    techRationale:
-      "Figma + Principle for high-fidelity prototyping with realistic micro-animations. HTML/CSS for stakeholder demos that felt production-ready without a full engineering handoff.",
-    businessGoals:
-      "Reduce customer service contacts related to payment errors. Improve benefit discovery rate among existing cardholders.",
+      "차량 탐색부터 상세 정보 확인, 구매 고려 단계까지 이어지는 흐름을 정리하고 KIA 브랜드 경험의 일관성을 높인 글로벌 웹사이트 리뉴얼 프로젝트입니다.",
+    problem:
+      "기존 사이트는 차량 정보와 구매 고려 정보가 분산되어 있어 탐색 흐름이 길고, 화면별 브랜드 경험도 일관되게 느껴지기 어려웠습니다.",
+    goal:
+      "차량 탐색, 모델 비교, 상세 정보 확인, 구매 고려 흐름을 더 직관적으로 연결하고, 팀 전체가 같은 UI 규칙으로 작업할 수 있게 만드는 것이 목표였습니다.",
+    myRole:
+      "디자인 리드로 비주얼 콘셉트와 UI 시스템 방향을 정리하고, 팀원이 작업한 주요 페이지의 시각적 일관성을 검토했습니다.",
+    process: [
+      "차량 탐색부터 상세 정보 확인까지의 사용자 여정을 분석했습니다.",
+      "모델 카드, 빌드 플로우, 상세 히어로 화면의 역할을 나눠 핵심 정보를 배치했습니다.",
+      "여러 팀원이 만든 화면이 하나의 브랜드 경험처럼 보이도록 공통 UI 규칙을 정리했습니다.",
+      "HTML/CSS 구현 가능성을 고려해 디자인 방향을 제안했습니다.",
+    ],
+    designSolution:
+      "모델 탐색 화면은 비교 기준을 빠르게 읽게 하고, 빌드 플로우는 구매 고려 단계를 시각적으로 이어주며, 상세 히어로는 브랜드 몰입과 주요 정보 확인을 함께 담당하도록 구성했습니다.",
+    keyScreens: [
+      "모델 카드 탐색 화면",
+      "차량 빌드 플로우",
+      "EV9 상세 히어로 화면",
+      "공통 UI 규칙과 비주얼 콘셉트",
+    ],
+    confirmNeeded: [
+      "82.3% 수치의 설문 캡처를 첨부해야 합니다.",
+      "최우수상 수상 근거 이미지를 첨부하면 신뢰도가 높아집니다.",
+      "팀 내에서 본인이 리드한 화면 범위를 명확히 표시하는 것이 좋습니다.",
+    ],
+    tech: ["Figma", "HTML", "CSS", "JavaScript", "Design System"],
     contributions: [
-      "Heuristic evaluation across 40+ screens",
-      "Redesigned the payment confirmation flow",
-      "Built a component-level design system for the dashboard",
+      "비주얼 콘셉트와 디자인 시스템 방향을 리드했습니다.",
+      "주요 화면을 검토해 시각적 일관성을 맞췄습니다.",
+      "사용자 여정과 차량 탐색 흐름을 화면 구조에 연결했습니다.",
     ],
     sar: [
       {
-        s: "Problem statement pending. Describe the task flow or information hierarchy issue.",
-        a: "Action pending. Explain the redesign or prototype decision you owned.",
-        r: "Result pending. Add verified testing, review, or comparison evidence.",
+        s: "차량 탐색과 구매 고려 정보가 분산되어 사용자가 다음 행동을 판단하기 어려웠습니다.",
+        a: "모델 탐색, 빌드 플로우, 상세 히어로의 역할을 분리하고 흐름이 이어지도록 화면 구조를 정리했습니다.",
+        r: "17명 설문에서 82.3% 긍정 선호 변화가 있었고, 4개 팀 중 최우수상을 받았습니다.",
       },
       {
-        s: "Constraint pending. Note legacy UI, scope, or brand-system limitations.",
-        a: "Execution pending. Summarize how you balanced constraint and clarity.",
-        r: "Learning pending. Capture the decision-making value for reviewers.",
+        s: "여러 팀원이 만든 화면이 하나의 브랜드 경험처럼 보이게 해야 했습니다.",
+        a: "공통 UI 규칙과 비주얼 톤을 정리하고 주요 화면의 일관성을 검토했습니다.",
+        r: "UX 흐름, BX 감각, 디자인 리드 경험을 함께 보여주는 프로젝트로 정리했습니다.",
       },
     ],
-    reflection:
-      "Partial renewals are harder than full rebuilds because every decision collides with legacy constraints. This sharpened my ability to advocate for UX within systemic limits.",
+    takeaway:
+      "브랜드 경험은 큰 이미지뿐 아니라 사용자가 탐색하고 비교하고 다음 행동을 결정하는 흐름 전체에서 만들어진다는 점을 배웠습니다.",
   },
   {
     id: "04",
-    type: "Team Project",
-    title: "POLJJAK",
-    subtitle: "College App Planning",
-    year: "2022",
-    role: "UX Strategist & Lead Designer",
+    type: "Creative Foundation",
+    title: "예술 포트폴리오 플랫폼",
+    subtitle: "서비스 기획 아카이브",
+    roomTitle: "Creative Foundation",
+    year: "2023.04-05",
+    period: "2개월",
+    role: "PM / 기획",
     mark: "stack" as const,
-    metricNote: "Metrics pending until verified project data is added.",
-    result: "Result summary pending. Add only verified outcomes before publishing.",
+    evidenceStatus: "기획 문서 기반 보조 프로젝트",
+    metricNote: "메인 성과 지표가 아닌 기획 배경 보조 자료",
+    result: "예술 전공자의 작업물 관리와 공유 문제를 서비스 구조로 바라본 초기 기획 경험입니다.",
     achievements: [
-      { value: "TBD", label: "Research Scope" },
-      { value: "TBD", label: "Prototype Depth" },
-      { value: "TBD", label: "Validation" },
+      { value: "예술", label: "도메인" },
+      { value: "PM", label: "역할" },
+      { value: "Flow", label: "서비스 구조" },
     ],
     summary:
-      "Strategic UX planning for a college application management app, covering research synthesis, information architecture, and a high-fidelity prototype.",
-    tech: ["Figma", "Miro", "Maze", "Notion"],
-    techRationale:
-      "Figma for all design deliverables. Miro for collaborative synthesis workshops. Maze for unmoderated usability testing at scale with student panels across three schools.",
-    businessGoals:
-      "Reduce applicant anxiety during the college application process. Provide a structured, scalable framework that works across different school systems.",
+      "예술 전공자의 작업물 관리, 아카이빙, 공유 흐름을 서비스 기획 관점에서 정리한 보조 프로젝트입니다.",
+    problem:
+      "예술 전공자는 작업물과 과정 기록이 여러 파일과 채널에 흩어지기 쉽고, 포트폴리오로 정리하거나 공유하는 과정이 번거로웠습니다.",
+    goal:
+      "작업 단계별 아카이빙과 공유가 가능한 예술 분야 포트폴리오 플랫폼 구조를 기획하는 것이 목표였습니다.",
+    myRole:
+      "PM/기획 역할로 사용자 여정, 서비스 플로우, 기획 문서 산출물을 정리했습니다. 현재 포트폴리오에서는 보조 아카이브로 배치하는 것이 적절합니다.",
+    process: [
+      "예술 전공자의 작업물 관리와 공유 문제를 정의했습니다.",
+      "사용자 여정 지도와 서비스 플로우를 작성했습니다.",
+      "아카이빙과 공유 기능을 중심으로 플랫폼 구조를 기획했습니다.",
+    ],
+    designSolution:
+      "작업 단계별 기록, 포트폴리오 정리, 외부 공유 흐름을 하나의 서비스 플로우로 연결하는 방향을 제안했습니다.",
+    keyScreens: [
+      "사용자 여정 지도",
+      "서비스 플로우",
+      "포트폴리오 아카이빙 구조",
+      "비즈니스 모델 개요",
+    ],
+    confirmNeeded: [
+      "공개 가능한 발표 자료 일부를 이미지로 첨부하면 좋습니다.",
+      "메인 프로젝트보다 보조 아카이브로 낮게 배치하는 것이 적절합니다.",
+    ],
+    tech: ["PPT", "Word", "User Journey Map", "Service Flow"],
     contributions: [
-      "Facilitated 3 research sprints across student and counselor personas",
-      "Defined the core information architecture and all critical task flows",
-      "Delivered a 120-screen interactive prototype for the investor demo",
+      "예술 전공자 관점에서 서비스 문제를 정의했습니다.",
+      "아카이브와 공유 흐름을 서비스 플로우로 구조화했습니다.",
+      "미술 기반 배경을 UX 기획 관심사로 연결했습니다.",
     ],
     sar: [
       {
-        s: "Problem statement pending. Describe the user pain point with research context.",
-        a: "Action pending. Explain the planning, IA, or prototype decision you owned.",
-        r: "Result pending. Add verified user feedback or testing outcome.",
+        s: "예술 전공자는 작업 과정과 결과물을 체계적으로 모으고 공유하는 데 어려움이 있었습니다.",
+        a: "작업 단계별 아카이빙과 외부 공유 흐름을 중심으로 서비스 구조를 기획했습니다.",
+        r: "미술 기반 배경과 서비스 기획 관심사를 보여주는 보조 프로젝트로 활용할 수 있습니다.",
       },
       {
-        s: "Constraint pending. Note research, collaboration, or product-scope limits.",
-        a: "Execution pending. Summarize how the concept was clarified.",
-        r: "Learning pending. Capture how the project strengthened your UX judgment.",
+        s: "현재 UIUX 실행 역량을 가장 강하게 보여주는 프로젝트는 아니었습니다.",
+        a: "대표 프로젝트가 아니라 Creative Foundation 아카이브로 배치했습니다.",
+        r: "포트폴리오의 초점이 흐려지지 않도록 기획 배경을 보완하는 역할로 정리했습니다.",
       },
     ],
-    reflection:
-      "Designing for anxiety reduction requires fundamentally different success metrics than designing for efficiency. I'd formalize a 'stress audit' methodology for future student-facing products.",
+    takeaway:
+      "창작물도 사용자가 찾고, 정리하고, 공유할 수 있는 구조가 필요하다는 점을 서비스 기획 관점에서 배웠습니다.",
   },
 ] as const;
 

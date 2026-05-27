@@ -33,14 +33,31 @@ type MainHeroProps = {
 type MorphMeasurements = {
   startY: number;
   endY: number;
-  targetCenterX: number;
-  targetCenterY: number;
+  aboutSectionTop: number;
+  targetDockViewportX: number;
+  targetDockViewportY: number;
   targetScale: number;
 };
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(Math.max(value, min), max);
 const easeOutCubic = (value: number) => 1 - Math.pow(1 - clamp(value), 3);
 const interpolate = (from: number, to: number, progress: number) => from + (to - from) * progress;
+const MAX_HERO_WHEEL_STEP_RATIO = 0.28;
+const FLIP_COMPLETE_PROGRESS = 0.42;
+const DOCK_MORPH_START_PROGRESS = 0.42;
+const DOCK_COMPLETE_PROGRESS = 0.999;
+
+const getWheelDeltaY = (event: WheelEvent) => {
+  if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+    return event.deltaY * 16;
+  }
+
+  if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+    return event.deltaY * window.innerHeight;
+  }
+
+  return event.deltaY;
+};
 
 function StretcherFrame() {
   return (
@@ -135,6 +152,7 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
   const faceModeRef = useRef<CanvasFaceMode>("idle");
   const scrollDirectionRef = useRef<CanvasScrollDirection>("forward");
   const previousProgressRef = useRef(0);
+  const dockSnapRequestedRef = useRef(false);
 
 
   useEffect(() => {
@@ -212,27 +230,43 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
         setScrollDirection(progress > previousProgress ? "forward" : "backward");
         previousProgressRef.current = progress;
       }
-      const flipCompleteProgress = 0.42;
-      const travelProgress = easeOutCubic((progress - 0.62) / 0.38);
-      const rotateProgress = travelProgress;
-      const scaleProgress = travelProgress;
-      const moveProgress = travelProgress;
-      const targetViewportX = measurements.targetCenterX - window.scrollX;
-      const targetViewportY = measurements.targetCenterY - scrollY;
-      const deltaX = (targetViewportX - window.innerWidth / 2) * moveProgress;
-      const deltaY = (targetViewportY - window.innerHeight / 2) * moveProgress;
+
+      if (scrollY < measurements.aboutSectionTop - 1 || scrollY >= measurements.endY - 1) {
+        dockSnapRequestedRef.current = false;
+      }
+
+      if (
+        scrollDirectionRef.current === "forward" &&
+        !dockSnapRequestedRef.current &&
+        scrollY >= measurements.aboutSectionTop - 1 &&
+        scrollY < measurements.endY - 1
+      ) {
+        dockSnapRequestedRef.current = true;
+        window.scrollTo({
+          top: measurements.endY,
+          behavior: "smooth",
+        });
+      }
+
+      const rotateProgress = easeOutCubic(
+        (progress - DOCK_MORPH_START_PROGRESS) / (1 - DOCK_MORPH_START_PROGRESS),
+      );
+      const moveProgress = rotateProgress;
+      const scaleProgress = moveProgress;
+      const deltaX = (measurements.targetDockViewportX - window.innerWidth / 2) * moveProgress;
+      const deltaY = (measurements.targetDockViewportY - window.innerHeight / 2) * moveProgress;
       const scale = interpolate(1, measurements.targetScale, scaleProgress);
       const rotate = interpolate(0, 90, rotateProgress);
-      const radius = interpolate(0, 18, travelProgress);
-      const nextStage: CanvasScrollStage = progress <= 0 ? "cover" : progress >= 0.995 ? "docked" : "flipping";
-      const nextFaceMode: CanvasFaceMode = progress <= 0 ? "idle" : progress < flipCompleteProgress ? "flipping" : "front";
+      const radius = interpolate(0, 18, moveProgress);
+      const nextStage: CanvasScrollStage = progress <= 0 ? "cover" : progress >= DOCK_COMPLETE_PROGRESS ? "docked" : "flipping";
+      const nextFaceMode: CanvasFaceMode = progress <= 0 ? "idle" : progress < FLIP_COMPLETE_PROGRESS ? "flipping" : "front";
 
       setMorphVariable("--hero-morph-x", `${deltaX.toFixed(2)}px`);
       setMorphVariable("--hero-morph-y", `${deltaY.toFixed(2)}px`);
       setMorphVariable("--hero-morph-scale", scale.toFixed(4));
       setMorphVariable("--hero-morph-rotate", `${rotate.toFixed(2)}deg`);
       setMorphVariable("--hero-morph-radius", `${radius.toFixed(2)}px`);
-      setMorphVariable("--hero-morph-opacity", progress >= 0.995 ? "0" : "1");
+      setMorphVariable("--hero-morph-opacity", progress >= DOCK_COMPLETE_PROGRESS ? "0" : "1");
       setFaceMode(nextFaceMode);
       setStage(nextStage);
     };
@@ -248,8 +282,41 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
       });
     };
 
+    const constrainHeroWheel = (event: WheelEvent) => {
+      const measurements = measurementsRef.current;
+
+      if (!measurements || shouldUseSimpleLayout() || event.ctrlKey) {
+        return;
+      }
+
+      const deltaY = getWheelDeltaY(event);
+      const scrollY = window.scrollY;
+      const sectionTop = sectionElement.offsetTop;
+      const isForwardMorphScroll = deltaY > 0 && scrollY >= sectionTop - 1 && scrollY < measurements.endY - 1;
+      const isBackwardMorphScroll = deltaY < 0 && scrollY > measurements.startY + 1 && scrollY <= measurements.endY + 1;
+
+      if (!isForwardMorphScroll && !isBackwardMorphScroll) {
+        return;
+      }
+
+      const maxWheelStep = window.innerHeight * MAX_HERO_WHEEL_STEP_RATIO;
+
+      if (Math.abs(deltaY) <= maxWheelStep) {
+        return;
+      }
+
+      event.preventDefault();
+
+      window.scrollTo({
+        top: clamp(scrollY + Math.sign(deltaY) * maxWheelStep, sectionTop, measurements.endY),
+        behavior: "auto",
+      });
+      requestMorphUpdate();
+    };
+
     const measureMorphTargets = () => {
       const targetElement = document.querySelector<HTMLElement>(".about-profile-target");
+      const targetImageElement = document.querySelector<HTMLElement>(".about-profile-target__image");
 
       if (!targetElement || shouldUseSimpleLayout()) {
         measurementsRef.current = null;
@@ -259,22 +326,24 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
 
       const sectionRect = sectionElement.getBoundingClientRect();
       const frameRect = frameElement.getBoundingClientRect();
-      const targetRect = targetElement.getBoundingClientRect();
+      const targetRect = (targetImageElement ?? targetElement).getBoundingClientRect();
       const pageScrollY = window.scrollY;
       const pageScrollX = window.scrollX;
       const heroTop = sectionRect.top + pageScrollY;
+      const aboutSectionTop = targetElement.closest<HTMLElement>(".about-section")?.offsetTop ?? targetElement.offsetTop;
       const targetTop = targetRect.top + pageScrollY;
       const targetCenterX = targetRect.left + pageScrollX + targetRect.width / 2;
       const targetCenterY = targetTop + targetRect.height / 2;
       const startY = heroTop + 24;
-      const endY = Math.max(startY + 1, targetTop - window.innerHeight * 0.48);
+      const endY = Math.max(startY + 1, targetTop - 12);
       const targetScale = targetRect.width / Math.max(frameRect.height, 1);
 
       measurementsRef.current = {
         startY,
         endY,
-        targetCenterX,
-        targetCenterY,
+        aboutSectionTop,
+        targetDockViewportX: targetCenterX - pageScrollX,
+        targetDockViewportY: targetCenterY - endY,
         targetScale,
       };
 
@@ -284,6 +353,7 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
     measureMorphTargets();
 
     window.addEventListener("scroll", requestMorphUpdate, { passive: true });
+    sectionElement.addEventListener("wheel", constrainHeroWheel, { passive: false });
     window.addEventListener("resize", measureMorphTargets);
     window.addEventListener("load", measureMorphTargets);
     reduceMotionQuery.addEventListener("change", measureMorphTargets);
@@ -295,6 +365,7 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
       }
 
       window.removeEventListener("scroll", requestMorphUpdate);
+      sectionElement.removeEventListener("wheel", constrainHeroWheel);
       window.removeEventListener("resize", measureMorphTargets);
       window.removeEventListener("load", measureMorphTargets);
       reduceMotionQuery.removeEventListener("change", measureMorphTargets);
@@ -353,7 +424,7 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
 
             <div className="canvas-separator">
               <span className="canvas-separator__line" />
-              <span className="canvas-separator__text">Frontend Developer &amp; UI/UX Designer</span>
+              <span className="canvas-separator__text">UIUX Portfolio Exhibition</span>
               <span className="canvas-separator__line" />
             </div>
           </div>
@@ -365,9 +436,9 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
         <footer className="room-cover__footer-strip">
           <div className="room-cover__footer-counter">
             <span className="room-cover__footer-dot" />
-            <span className="room-cover__footer-counter-text">01 / 03 - Portfolio</span>
+            <span className="room-cover__footer-counter-text">Entrance - UIUX Portfolio</span>
           </div>
-          <span className="room-cover__footer-scroll-hint">scroll to explore</span>
+          <span className="room-cover__footer-scroll-hint">Scroll to enter the exhibition</span>
           <span className="room-cover__footer-location">Seoul, KR</span>
         </footer>
       </main>

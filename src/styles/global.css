@@ -1,5 +1,12 @@
 /* Global base styles, focus states, motion preferences, and shared utilities. */
 
+html,
+body,
+#root {
+  min-height: 100%;
+  background-color: var(--color-bg);
+}
+
 body {
   background-color: var(--color-bg);
   color: var(--color-text-main);
