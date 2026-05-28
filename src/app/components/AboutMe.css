@@ -256,11 +256,11 @@
 }
 
 .about-grid__detail-scroll > .about-detail-reveal:nth-child(2) {
-  transition-delay: 0.18s;
+  transition-delay: 0.52s;
 }
 
 .about-grid__detail-scroll > .about-detail-reveal:nth-child(3) {
-  transition-delay: 0.3s;
+  transition-delay: 0.68s;
 }
 
 .about-tools__heading,
@@ -361,16 +361,18 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  width: 100%;
   min-width: 0;
 }
 
 .about-skill__track {
+  box-sizing: border-box;
   display: block;
-  flex: 0 0 104px;
-  width: 104px;
-  min-width: 104px;
-  max-width: 104px;
-  height: 19px;
+  flex: 1 1 72px;
+  width: min(72px, 100%);
+  min-width: 0;
+  max-width: 72px;
+  height: 18px;
   padding: 2px;
   overflow: hidden;
   border-radius: 555px;
@@ -379,7 +381,7 @@
 
 .about-skill__bar {
   display: block;
-  height: 15px;
+  height: 14px;
   border-radius: 555px;
   background: #7d7d7d;
   transform: scaleX(0);
@@ -429,11 +431,11 @@
 }
 
 .about-skill__bar--71 {
-  width: 71px;
+  width: 71%;
 }
 
 .about-skill__bar--54 {
-  width: 54px;
+  width: 54%;
 }
 
 .about-skill__level-text {

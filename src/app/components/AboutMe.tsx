@@ -93,7 +93,7 @@ function SkillCard({ item }: { item: SkillItem }) {
 
 function TimelineSection({ title, items }: { title: string; items: TimelineItem[] }) {
   return (
-    <section className="about-timeline" aria-labelledby={`about-${title}`}>
+    <section className="about-timeline about-detail-reveal" aria-labelledby={`about-${title}`}>
       <h3 id={`about-${title}`} className="about-timeline__heading">
         {title}
       </h3>
@@ -176,6 +176,11 @@ export function AboutMe({ showDockedCanvas = false }: AboutMeProps) {
           }
 
           entry.target.classList.add("is-visible");
+          const nextTimeline = entry.target.nextElementSibling;
+          if (entry.target.classList.contains("about-timeline") && nextTimeline?.classList.contains("about-timeline")) {
+            nextTimeline.classList.add("is-visible");
+            observer.unobserve(nextTimeline);
+          }
           observer.unobserve(entry.target);
         });
       },

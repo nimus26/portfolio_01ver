@@ -218,6 +218,18 @@
   background: transparent;
 }
 
+@media (min-width: 1441px) {
+  .museum-navbar__inner,
+  .gallery-room,
+  .site-footer__inner,
+  .site-footer__copy {
+    width: 100%;
+    max-width: var(--grid-max-width);
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+
 .room-cover {
   --hero-scroll-runway: 220vh;
   min-height: var(--hero-scroll-runway);
