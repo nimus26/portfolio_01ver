@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import canvasFront from "../../asset/canvas_front_cut.png";
+import profileImg from "../../asset/profile_img.png";
 import figmaIcon from "../../asset/about_icon_figma.png";
 import cssIcon from "../../asset/about_icon_css.png";
 import vscodeIcon from "../../asset/about_icon_vscode.png";
@@ -118,9 +120,104 @@ function TimelineSection({ title, items }: { title: string; items: TimelineItem[
 }
 
 export function AboutMe({ showDockedCanvas = false }: AboutMeProps) {
+  const detailScrollRef = useRef<HTMLDivElement>(null);
+  const aboutHeaderRef = useRef<HTMLElement>(null);
+  const [hasMoreDetail, setHasMoreDetail] = useState(false);
+  const [shouldStartDetailReveal, setShouldStartDetailReveal] = useState(false);
+
+  useEffect(() => {
+    const updateRevealStart = () => {
+      const header = aboutHeaderRef.current;
+      if (!header) {
+        return;
+      }
+
+      const headerRect = header.getBoundingClientRect();
+      const headerCenterY = headerRect.top + headerRect.height / 2;
+
+      setShouldStartDetailReveal(headerCenterY <= window.innerHeight / 2);
+    };
+
+    updateRevealStart();
+    window.addEventListener("scroll", updateRevealStart, { passive: true });
+    window.addEventListener("resize", updateRevealStart);
+
+    return () => {
+      window.removeEventListener("scroll", updateRevealStart);
+      window.removeEventListener("resize", updateRevealStart);
+    };
+  }, []);
+
+  useEffect(() => {
+    const root = detailScrollRef.current;
+
+    if (!root) {
+      return undefined;
+    }
+
+    const targets = Array.from(root.querySelectorAll<HTMLElement>(".about-detail-reveal, .about-skill"));
+    const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    if (!shouldStartDetailReveal) {
+      targets.forEach((target) => target.classList.remove("is-visible"));
+      return undefined;
+    }
+
+    if (reduceMotionQuery.matches) {
+      targets.forEach((target) => target.classList.add("is-visible"));
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        root,
+        rootMargin: "0px 0px -12% 0px",
+        threshold: 0.22,
+      },
+    );
+
+    targets.forEach((target) => observer.observe(target));
+
+    return () => observer.disconnect();
+  }, [shouldStartDetailReveal]);
+
+  useEffect(() => {
+    const root = detailScrollRef.current;
+
+    if (!root) {
+      return undefined;
+    }
+
+    const updateScrollHint = () => {
+      const hasScrollableRemainder = root.scrollTop + root.clientHeight < root.scrollHeight - 2;
+      setHasMoreDetail(hasScrollableRemainder);
+    };
+
+    const resizeObserver = new ResizeObserver(updateScrollHint);
+
+    updateScrollHint();
+    root.addEventListener("scroll", updateScrollHint, { passive: true });
+    resizeObserver.observe(root);
+
+    return () => {
+      root.removeEventListener("scroll", updateScrollHint);
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   return (
     <section id="room-01-about" className="about-section" aria-labelledby="about-title">
-      <header className="about-header">
+      <header ref={aboutHeaderRef} className="about-header">
         <div className="about-label-row">
           <span className="about-section-label">Room 01 // 소개</span>
           <span className="about-rule" aria-hidden="true" />
@@ -135,6 +232,7 @@ export function AboutMe({ showDockedCanvas = false }: AboutMeProps) {
         <aside className="about-grid__intro" aria-label="프로필 소개">
           <div className={`about-profile-target${showDockedCanvas ? " is-docked" : ""}`}>
             <img className="about-profile-target__image" src={canvasFront} alt="" aria-hidden="true" />
+            <img className="about-profile-target__overlay" src={profileImg} alt="" aria-hidden="true" />
           </div>
 
           <div className="about-person">
@@ -155,8 +253,11 @@ export function AboutMe({ showDockedCanvas = false }: AboutMeProps) {
         </aside>
 
         <div className="about-grid__detail">
-          <div className="about-grid__detail-scroll">
-            <section className="about-tools" aria-labelledby="about-tools-title">
+          <div
+            ref={detailScrollRef}
+            className={`about-grid__detail-scroll${hasMoreDetail ? " has-more-detail" : ""}`}
+          >
+            <section className="about-tools about-detail-reveal" aria-labelledby="about-tools-title">
               <h3 id="about-tools-title" className="about-tools__heading">
                 작업 도구
               </h3>

@@ -34,8 +34,10 @@ type MorphMeasurements = {
   startY: number;
   endY: number;
   aboutSectionTop: number;
-  targetDockViewportX: number;
-  targetDockViewportY: number;
+  lineStartPageCenterX: number;
+  lineStartPageCenterY: number;
+  targetPageCenterX: number;
+  targetPageCenterY: number;
   targetScale: number;
 };
 
@@ -43,8 +45,11 @@ const clamp = (value: number, min = 0, max = 1) => Math.min(Math.max(value, min)
 const easeOutCubic = (value: number) => 1 - Math.pow(1 - clamp(value), 3);
 const interpolate = (from: number, to: number, progress: number) => from + (to - from) * progress;
 const MAX_HERO_WHEEL_STEP_RATIO = 0.28;
-const FLIP_COMPLETE_PROGRESS = 0.42;
-const DOCK_MORPH_START_PROGRESS = 0.42;
+const WIRE_IMAGE_PROGRESS = 0.08;
+const BACK_IMAGE_PROGRESS = 0.18;
+const FLIP_START_PROGRESS = 0.34;
+const FLIP_COMPLETE_PROGRESS = 0.58;
+const DOCK_MORPH_START_PROGRESS = 0.68;
 const DOCK_COMPLETE_PROGRESS = 0.999;
 
 const getWheelDeltaY = (event: WheelEvent) => {
@@ -173,8 +178,6 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
       stageRef.current = nextStage;
       setCanvasScrollStage(nextStage);
       onCanvasDockedChange?.(nextStage === "docked");
-
-      setCanvasPhase(nextStage === "cover" ? "svg" : "back");
     };
 
     const setMorphVariable = (name: string, value: string) => {
@@ -239,11 +242,11 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
         scrollDirectionRef.current === "forward" &&
         !dockSnapRequestedRef.current &&
         scrollY >= measurements.aboutSectionTop - 1 &&
-        scrollY < measurements.endY - 1
+        scrollY < measurements.endY - window.innerHeight * 0.12
       ) {
         dockSnapRequestedRef.current = true;
         window.scrollTo({
-          top: measurements.endY,
+          top: measurements.endY - window.innerHeight * 0.12,
           behavior: "smooth",
         });
       }
@@ -253,13 +256,29 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
       );
       const moveProgress = rotateProgress;
       const scaleProgress = moveProgress;
-      const deltaX = (measurements.targetDockViewportX - window.innerWidth / 2) * moveProgress;
-      const deltaY = (measurements.targetDockViewportY - window.innerHeight / 2) * moveProgress;
+      const linePageCenterX = interpolate(
+        measurements.lineStartPageCenterX,
+        measurements.targetPageCenterX,
+        moveProgress,
+      );
+      const linePageCenterY = interpolate(
+        measurements.lineStartPageCenterY,
+        measurements.targetPageCenterY,
+        moveProgress,
+      );
+      const lineViewportCenterX = linePageCenterX - window.scrollX;
+      const lineViewportCenterY = linePageCenterY - scrollY;
+      const deltaX = moveProgress <= 0 ? 0 : lineViewportCenterX - window.innerWidth / 2;
+      const deltaY = moveProgress <= 0 ? 0 : lineViewportCenterY - window.innerHeight / 2;
       const scale = interpolate(1, measurements.targetScale, scaleProgress);
       const rotate = interpolate(0, 90, rotateProgress);
       const radius = interpolate(0, 18, moveProgress);
-      const nextStage: CanvasScrollStage = progress <= 0 ? "cover" : progress >= DOCK_COMPLETE_PROGRESS ? "docked" : "flipping";
-      const nextFaceMode: CanvasFaceMode = progress <= 0 ? "idle" : progress < FLIP_COMPLETE_PROGRESS ? "flipping" : "front";
+      const nextPhase: CanvasPhase =
+        progress < WIRE_IMAGE_PROGRESS ? "svg" : progress < BACK_IMAGE_PROGRESS ? "wire" : "back";
+      const nextStage: CanvasScrollStage =
+        progress < FLIP_START_PROGRESS ? "cover" : progress >= DOCK_COMPLETE_PROGRESS ? "docked" : "flipping";
+      const nextFaceMode: CanvasFaceMode =
+        progress < FLIP_START_PROGRESS ? "idle" : progress < FLIP_COMPLETE_PROGRESS ? "flipping" : "front";
 
       setMorphVariable("--hero-morph-x", `${deltaX.toFixed(2)}px`);
       setMorphVariable("--hero-morph-y", `${deltaY.toFixed(2)}px`);
@@ -267,6 +286,7 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
       setMorphVariable("--hero-morph-rotate", `${rotate.toFixed(2)}deg`);
       setMorphVariable("--hero-morph-radius", `${radius.toFixed(2)}px`);
       setMorphVariable("--hero-morph-opacity", progress >= DOCK_COMPLETE_PROGRESS ? "0" : "1");
+      setCanvasPhase(nextPhase);
       setFaceMode(nextFaceMode);
       setStage(nextStage);
     };
@@ -316,7 +336,7 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
 
     const measureMorphTargets = () => {
       const targetElement = document.querySelector<HTMLElement>(".about-profile-target");
-      const targetImageElement = document.querySelector<HTMLElement>(".about-profile-target__image");
+      const aboutHeaderElement = document.querySelector<HTMLElement>(".about-header");
 
       if (!targetElement || shouldUseSimpleLayout()) {
         measurementsRef.current = null;
@@ -325,8 +345,8 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
       }
 
       const sectionRect = sectionElement.getBoundingClientRect();
-      const frameRect = frameElement.getBoundingClientRect();
-      const targetRect = (targetImageElement ?? targetElement).getBoundingClientRect();
+      const targetRect = targetElement.getBoundingClientRect();
+      const aboutHeaderRect = aboutHeaderElement?.getBoundingClientRect();
       const pageScrollY = window.scrollY;
       const pageScrollX = window.scrollX;
       const heroTop = sectionRect.top + pageScrollY;
@@ -334,16 +354,24 @@ export function MainHero({ onCanvasDockedChange }: MainHeroProps) {
       const targetTop = targetRect.top + pageScrollY;
       const targetCenterX = targetRect.left + pageScrollX + targetRect.width / 2;
       const targetCenterY = targetTop + targetRect.height / 2;
-      const startY = heroTop + 24;
-      const endY = Math.max(startY + 1, targetTop - 12);
-      const targetScale = targetRect.width / Math.max(frameRect.height, 1);
+      const aboutHeaderCenterY = aboutHeaderRect
+        ? aboutHeaderRect.top + pageScrollY + aboutHeaderRect.height / 2
+        : targetTop;
+      const startY = heroTop - window.innerHeight * 0.12;
+      const endY = Math.max(startY + 1, aboutHeaderCenterY - window.innerHeight / 2);
+      const lineStartScrollY = startY + (endY - startY) * DOCK_MORPH_START_PROGRESS;
+      const baseFrameWidth = Math.min(window.innerWidth * 0.8, W);
+      const baseFrameHeight = baseFrameWidth * (H / W);
+      const targetScale = targetRect.width / Math.max(baseFrameHeight, 1);
 
       measurementsRef.current = {
         startY,
         endY,
         aboutSectionTop,
-        targetDockViewportX: targetCenterX - pageScrollX,
-        targetDockViewportY: targetCenterY - endY,
+        lineStartPageCenterX: pageScrollX + window.innerWidth / 2,
+        lineStartPageCenterY: lineStartScrollY + window.innerHeight / 2,
+        targetPageCenterX: targetCenterX,
+        targetPageCenterY: targetCenterY,
         targetScale,
       };
 
