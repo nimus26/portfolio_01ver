@@ -1,4 +1,5 @@
 node_modules/
+.pnpm-store/
 dist/
 build/
 vite-dev*.log
@@ -7,12 +8,22 @@ vite-dev*.log
 .env
 .env.*
 !.env.example
+.envrc
 *.pem
 *.key
+*.crt
+*.cer
+*.csr
 *.p12
 *.pfx
+*.jks
+*.keystore
+*.secret
+secrets/
+secrets.*
 credentials.json
 service-account*.json
+.vercel/
 
 # Logs and temporary output
 *.log

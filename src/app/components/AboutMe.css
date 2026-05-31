@@ -3,9 +3,9 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: auto;
   min-height: 768px;
-  overflow: hidden;
+  overflow: visible;
   padding-top: 128px;
   background: transparent;
 }
@@ -70,14 +70,17 @@
   display: grid;
   grid-template-columns: minmax(300px, 406px) minmax(0, 878px);
   gap: 64px;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-height: auto;
   padding: 28px var(--grid-margin) 44px;
   border-top: var(--border-default);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .about-grid__intro {
+  position: sticky;
+  top: 96px;
+  align-self: start;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -199,8 +202,8 @@
 .about-grid__detail {
   position: relative;
   min-width: 0;
-  min-height: 0;
-  overflow: hidden;
+  min-height: auto;
+  overflow: visible;
 }
 
 .about-grid__detail::after {
@@ -218,19 +221,19 @@
 }
 
 .about-grid__detail:has(.about-grid__detail-scroll.has-more-detail)::after {
-  opacity: 1;
+  opacity: 0;
 }
 
 .about-grid__detail-scroll {
   display: flex;
   flex-direction: column;
   gap: 52px;
-  height: 100%;
-  min-height: 0;
-  padding-right: 8px;
-  overflow-y: auto;
+  height: auto;
+  min-height: auto;
+  padding-right: 0;
+  overflow: visible;
   overscroll-behavior-y: auto;
-  scrollbar-gutter: stable;
+  scrollbar-gutter: auto;
 }
 
 .about-tools {
@@ -566,6 +569,7 @@
   }
 
   .about-grid__intro {
+    position: static;
     max-height: none;
     padding-right: 0;
     padding-bottom: var(--space-10);

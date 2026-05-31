@@ -1,541 +1,521 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type WheelEvent } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router";
+import galleryIndexJuhap from "../../asset/gallery_index_juhap.png";
 import { PROJECTS, type Project } from "../data/projects";
 import "./Gallery3D.css";
-import archiveServicePlan from "../../asset/case-studies/archive-service-plan.png";
-import juhapAiRecommend from "../../asset/case-studies/juhap-ai-recommend.png";
-import juhapAiChatProfile from "../../asset/case-studies/juhap-ai-chat-profile.png";
-import juhapChatbotEntry from "../../asset/case-studies/juhap-chatbot-entry.png";
-import juhapPairingDrink from "../../asset/case-studies/juhap-pairing-drink.png";
-import juhapProductHero from "../../asset/case-studies/juhap-product-hero.png";
-import juhapQuestionBanner from "../../asset/case-studies/juhap-question-banner.png";
-import juhapScanSample from "../../asset/case-studies/juhap-scan-sample.png";
-import juhapTodayPairingBanner from "../../asset/case-studies/juhap-today-pairing-banner.png";
-import kiaBuildFlowBg from "../../asset/case-studies/kia-build-flow-bg.png";
-import kiaEv9DetailHero from "../../asset/case-studies/kia-ev9-detail-hero.png";
-import kiaModelCard from "../../asset/case-studies/kia-model-card.png";
-import lotteEventFlow from "../../asset/case-studies/lotte-event-flow.png";
-import lotteLifeShopping from "../../asset/case-studies/lotte-life-shopping.png";
-import lotteMainVisualBg from "../../asset/case-studies/lotte-main-visual-bg.png";
 
-type ProjectVisualItem = {
-  src: string;
-  alt: string;
-  caption: string;
-};
+const FALLBACK_LABELS = ["THE INDEX", "THE OBSERVER", "THE SOLVER", "THE PROOF", "THE LOG"] as const;
+const CUBE_FACES = ["front", "right", "back", "left", "return"] as const;
+const MAX_WALL_INDEX = FALLBACK_LABELS.length - 1;
+const FACE_EDGE_SETTLE_MS = 260;
 
-const PROJECT_VISUALS: Record<string, ProjectVisualItem[]> = {
-  "01": [
-    {
-      src: lotteMainVisualBg,
-      alt: "롯데카드 리뉴얼 메인 비주얼 화면",
-      caption: "첫 화면에서 서비스 인상과 핵심 메시지를 먼저 전달하도록 메인 비주얼의 역할을 분리했습니다.",
-    },
-    {
-      src: lotteEventFlow,
-      alt: "롯데카드 이벤트와 혜택 안내 화면",
-      caption: "이벤트와 혜택 정보는 상품 탐색과 섞이지 않도록 별도 흐름으로 정리했습니다.",
-    },
-    {
-      src: lotteLifeShopping,
-      alt: "롯데카드 생활 카테고리 카드 탐색 화면",
-      caption: "카드 상품은 이름보다 사용 목적을 기준으로 비교할 수 있게 생활 카테고리 중심으로 배치했습니다.",
-    },
-  ],
-  "02": [
-    {
-      src: juhapAiRecommend,
-      alt: "주합 AI 추천 진입 배너",
-      caption: "검색어를 떠올리지 못한 사용자가 질문형 배너에서 바로 추천 흐름을 시작하도록 설계했습니다.",
-    },
-    {
-      src: juhapTodayPairingBanner,
-      alt: "주합 오늘의 페어링 배너",
-      caption: "상황과 음식 맥락을 먼저 보여줘 추천이 단순 상품 나열처럼 보이지 않게 했습니다.",
-    },
-    {
-      src: juhapChatbotEntry,
-      alt: "주합 챗봇 진입 화면",
-      caption: "챗봇은 별도 기능이 아니라 추천을 도와주는 대화형 진입점으로 배치했습니다.",
-    },
-    {
-      src: juhapScanSample,
-      alt: "주합 라벨 스캔 결과 화면",
-      caption: "오프라인에서 병 라벨을 본 상황을 바로 정보 확인과 추천 맥락으로 연결했습니다.",
-    },
-    {
-      src: juhapProductHero,
-      alt: "주합 주류 상세 정보 화면",
-      caption: "추천 이후 확인해야 할 주류 정보는 상세 화면에서 시각적으로 고정해 탐색을 마무리하게 했습니다.",
-    },
-    {
-      src: juhapQuestionBanner,
-      alt: "주합 커뮤니티 질문 배너",
-      caption: "추천 이후 다시 질문하고 기록하는 흐름을 열어 커뮤니티 사용으로 확장했습니다.",
-    },
-    {
-      src: juhapPairingDrink,
-      alt: "주합 페어링 음료 이미지",
-      caption: "페어링 결과가 추상적인 설명에 머물지 않도록 실제 음료 이미지로 선택 맥락을 보강했습니다.",
-    },
-  ],
-  "03": [
-    {
-      src: kiaModelCard,
-      alt: "KIA 모델 카드 탐색 화면",
-      caption: "모델 탐색 화면은 차량 비교 기준을 빠르게 읽을 수 있도록 카드 구조로 정리했습니다.",
-    },
-    {
-      src: kiaBuildFlowBg,
-      alt: "KIA 차량 빌드 플로우 화면",
-      caption: "구매 고려 단계는 탐색에서 견적 확인까지 이어지는 흐름이 보이도록 구성했습니다.",
-    },
-    {
-      src: kiaEv9DetailHero,
-      alt: "KIA EV9 상세 히어로 화면",
-      caption: "상세 페이지는 브랜드 몰입 이미지와 핵심 정보를 함께 확인하는 첫 구간으로 설계했습니다.",
-    },
-  ],
-  "04": [
-    {
-      src: archiveServicePlan,
-      alt: "예술 포트폴리오 플랫폼 서비스 기획 문서",
-      caption: "대표 UI 프로젝트가 아니라, 예술 전공자의 작업 기록과 공유 문제를 서비스 구조로 정리한 기획 아카이브입니다.",
-    },
-  ],
-};
-
-const JUHAP_STORY = [
-  {
-    label: "문제",
-    title: "사용자는 무엇을 고를지보다 어디서 시작할지를 더 어려워했습니다.",
-    body:
-      "술 이름, 맛 표현, 음식 조합을 동시에 알아야 추천을 이해할 수 있었기 때문에 첫 진입 부담이 컸습니다.",
-  },
-  {
-    label: "판단",
-    title: "하나의 추천 기능보다 여러 시작점을 만드는 쪽이 적절했습니다.",
-    body:
-      "질문형 배너, 오늘의 페어링, 라벨 스캔, 챗봇을 서로 다른 맥락의 진입점으로 나누었습니다.",
-  },
-  {
-    label: "역할",
-    title: "PM/기획 관점에서 기능보다 흐름을 정리했습니다.",
-    body:
-      "팀 산출물을 개인 성과처럼 과장하지 않고, 추천 진입 구조와 콘텐츠 우선순위 정리에 초점을 맞췄습니다.",
-  },
-];
-
-const JUHAP_FLOW_NOTES = [
-  "질문형 진입: 사용자가 검색어를 몰라도 추천을 시작할 수 있게 합니다.",
-  "상황별 추천: 음식, 분위기, 취향을 기준으로 선택 맥락을 좁힙니다.",
-  "라벨 스캔: 오프라인에서 본 술을 바로 정보 확인으로 연결합니다.",
-  "챗봇: 긴 설명보다 짧은 질문으로 추천 기준을 좁힙니다.",
-  "커뮤니티: 추천 이후 질문과 기록으로 이어지는 후속 행동을 만듭니다.",
-];
-
-function WallLabel({ children }: { children: ReactNode }) {
-  return <p className="gallery-wall-label">{children}</p>;
-}
-
-function ProjectVisual({ project, compact = false }: { project: Project; compact?: boolean }) {
-  const visuals = PROJECT_VISUALS[project.id] ?? [];
-  const visibleVisuals = compact ? visuals.slice(0, 2) : visuals;
-
+function PhoneMock({ variant = "front" }: { variant?: "front" | "back" }) {
   return (
-    <div className={`project-visual${compact ? " project-visual--compact" : ""}`}>
-      <div className="project-visual__image-grid">
-        {visibleVisuals.map((visual) => (
-          <figure key={visual.src} className="project-visual__item">
-            <div className="project-visual__image-frame">
-              <img className="project-visual__image" src={visual.src} alt={visual.alt} />
+    <div className={`juhap-phone juhap-phone--${variant}`} aria-hidden="true">
+      <div className="juhap-phone__notch" />
+      <div className="juhap-phone__screen">
+        {variant === "front" ? (
+          <>
+            <div className="juhap-phone__topline">
+              <span>주합</span>
+              <span>⌕</span>
             </div>
-            <figcaption className="project-visual__caption">{visual.caption}</figcaption>
-          </figure>
-        ))}
+            <p className="juhap-phone__question">오늘은 어떤 술과 함께할까요?</p>
+            <div className="juhap-phone__hero-card">
+              <span>추천 페어링</span>
+              <strong>장작구이와 하우스 막걸리</strong>
+            </div>
+            <div className="juhap-phone__chips">
+              {["혼술", "회식", "선물", "입문"].map((item) => (
+                <span key={item}>{item}</span>
+              ))}
+            </div>
+            <div className="juhap-phone__food-grid">
+              <span />
+              <span />
+            </div>
+          </>
+        ) : (
+          <div className="juhap-phone__splash">
+            <strong>주합</strong>
+            <span>술을 고르는 흐름을 바꾸다</span>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function JuhapStoryBoard() {
+function WallIndexFigma230() {
   return (
-    <div className="juhap-story-board">
-      {JUHAP_STORY.map((item) => (
-        <article key={item.label} className="juhap-story-card">
-          <p className="juhap-story-card__label">{item.label}</p>
-          <h2 className="juhap-story-card__title">{item.title}</h2>
-          <p className="juhap-story-card__body">{item.body}</p>
-        </article>
-      ))}
-    </div>
-  );
-}
-
-function JuhapFlowBoard() {
-  return (
-    <div className="juhap-flow-board">
-      <div className="juhap-flow-board__visuals">
-        <figure className="juhap-flow-figure juhap-flow-figure--wide">
-          <img src={juhapScanSample} alt="주합 라벨 스캔 결과 화면" />
-          <figcaption>라벨 스캔에서 추천 맥락으로 이어지는 화면 근거</figcaption>
-        </figure>
-        <figure className="juhap-flow-figure">
-          <img src={juhapAiChatProfile} alt="주합 챗봇 프로필 화면" />
-          <figcaption>대화형 안내말의 친근한 진입점</figcaption>
-        </figure>
-      </div>
-      <ol className="juhap-flow-board__list">
-        {JUHAP_FLOW_NOTES.map((note, index) => (
-          <li key={note}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <p>{note}</p>
-          </li>
-        ))}
-      </ol>
-    </div>
-  );
-}
-
-function Wall1({ p }: { p: Project }) {
-  return (
-    <div className="gallery-wall">
-      <WallLabel>01 - 개요 / 화면 근거</WallLabel>
-
-      <div className="gallery-wall__title-stack">
-        <motion.h1
-          initial={{ opacity: 0, z: -40 }}
-          animate={{ opacity: 1, z: 0 }}
-          transition={{ delay: 0.25, duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
-          className="gallery-wall-title"
-        >
-          {p.title}
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="gallery-wall-subtitle"
-        >
-          {p.subtitle}
-        </motion.p>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, type: "spring", damping: 28, stiffness: 180 }}
-        className="gallery-wall__hero"
-      >
-        <ProjectVisual project={p} />
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.4 }}
-        className="gallery-wall__meta"
-      >
-        <div>
-          <p className="gallery-meta-label">
-            {p.type} - {p.year} - {p.period}
+    <div className="gallery-wall gallery-wall--index-figma">
+      <section className="gallery-index-section" data-node-id="230:1459">
+        <div className="gallery-index-section__copy">
+          <p className="gallery-index-section__eyebrow">01 / THE INDEX</p>
+          <h1 className="gallery-index-section__title">주합</h1>
+          <p className="gallery-index-section__summary">
+            정보의 양은 많지만 정작 '나에게 맞는 정답'을 찾지 못해 피로를 느끼는 소비자를 위해, 상황 기반
+            AI 추천과 유저 경험 데이터를 결합하여 '실패 없는 의사결정 도구'를 설계했습니다.
           </p>
-          <p className="gallery-summary">{p.summary}</p>
-        </div>
-        <div className="gallery-role-block">
-          <p className="gallery-meta-label">역할</p>
-          <p className="gallery-role">{p.role}</p>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
-
-function Wall2({ p }: { p: Project }) {
-  return (
-    <div className="gallery-wall">
-      <WallLabel>02 - 문제 / 목표 / 역할</WallLabel>
-
-      <div className="gallery-panel-grid gallery-panel-grid--two">
-        <motion.div
-          initial={{ opacity: 0, x: -24 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, type: "spring", damping: 28, stiffness: 160 }}
-          className="gallery-panel"
-        >
-          <p className="gallery-panel-label">문제</p>
-          <p className="gallery-lede">{p.problem}</p>
-
-          <div className="gallery-panel__section">
-            <p className="gallery-panel-label gallery-panel-label--compact">목표</p>
-            <p className="gallery-body-copy">{p.goal}</p>
-          </div>
-
-          <div className="gallery-panel__section">
-            <p className="gallery-panel-label gallery-panel-label--compact">나의 역할</p>
-            <p className="gallery-body-copy">{p.myRole}</p>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, x: 24 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.28, type: "spring", damping: 28, stiffness: 160 }}
-          className="gallery-panel"
-        >
-          <p className="gallery-panel-label">과정</p>
-          {p.id === "02" && <JuhapStoryBoard />}
-          <ul className="gallery-list">
-            {p.process.map((step) => (
-              <li key={step} className="gallery-list__item">
-                <span className="gallery-list__marker" aria-hidden="true">
-                  -
-                </span>
-                {step}
-              </li>
-            ))}
-          </ul>
-
-          <div className="gallery-panel__section">
-            <p className="gallery-panel-label gallery-panel-label--compact">도구 / 매체</p>
-            <div className="gallery-tech-tags">
-              {p.tech.map((tech) => (
-                <span key={tech} className="gallery-tech-tag">
-                  {tech}
-                </span>
-              ))}
+          <div className="gallery-index-section__meta">
+            <div>
+              <p>DURATION</p>
+              <span>2026.04 - 2026.05</span>
+            </div>
+            <div>
+              <p>ROLE</p>
+              <span>PM, 기획</span>
+            </div>
+            <div className="gallery-index-section__tools">
+              <p>TOOLS</p>
+              <span>Figma, Gemini, Codex, Claude, Perplexity, VS Code, Git/GitHub</span>
             </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+        <div className="gallery-index-section__visual">
+          <img
+            className="gallery-index-section__image"
+            src={galleryIndexJuhap}
+            alt="주합: 실패 없는 주종 페어링 인공지능 챗봇"
+          />
+        </div>
+      </section>
     </div>
   );
 }
 
-function Wall3({ p }: { p: Project }) {
+function WallIndexFigma() {
   return (
-    <div className="gallery-wall">
-      <WallLabel>03 - 해결안 / 주요 화면</WallLabel>
-
-      <div className="gallery-panel-grid gallery-panel-grid--two">
-        <motion.div
-          initial={{ opacity: 0, x: -24 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, type: "spring", damping: 28, stiffness: 160 }}
-          className="gallery-panel"
-        >
-          <p className="gallery-panel-label">디자인 해결안</p>
-          <p className="gallery-lede">{p.designSolution}</p>
-
-          <div className="gallery-panel__section">
-            <p className="gallery-panel-label gallery-panel-label--compact">주요 화면</p>
-            <ul className="gallery-list">
-              {p.keyScreens.map((screen) => (
-                <li key={screen} className="gallery-list__item">
-                  <span className="gallery-list__marker" aria-hidden="true">
-                    -
-                  </span>
-                  {screen}
-                </li>
-              ))}
-            </ul>
+    <div className="gallery-wall gallery-wall--index-figma">
+      <section className="gallery-index-section" data-node-id="170:1532">
+        <div className="gallery-index-section__copy">
+          <p className="gallery-index-section__eyebrow">01 / THE INDEX</p>
+          <h1 className="gallery-index-section__title">주합</h1>
+          <p className="gallery-index-section__summary">
+            정보의 양은 많지만 정작 '나에게 맞는 정답'을 찾지 못해 피로를 느끼는 소비자를 위해, 상황 기반
+            AI 추천과 유저 경험 데이터를 결합하여 '실패 없는 의사결정 도구'를 설계했습니다.
+          </p>
+          <div className="gallery-index-section__meta">
+            <div>
+              <p>DURATION</p>
+              <span>2026.04 - 2026.05</span>
+            </div>
+            <div>
+              <p>ROLE</p>
+              <span>PM, 기획</span>
+            </div>
+            <div className="gallery-index-section__tools">
+              <p>TOOLS</p>
+              <span>Figma, Gemini, Codex, Claude, Perplexity, VS Code, Git/GitHub</span>
+            </div>
           </div>
-        </motion.div>
+        </div>
+        <div className="gallery-index-section__visual">
+          <img
+            className="gallery-index-section__image"
+            src={galleryIndexJuhap}
+            alt="주합: 실패 없는 주종 페어링 인공지능 챗봇"
+          />
+        </div>
+      </section>
+    </div>
+  );
+}
 
-        <motion.div
-          initial={{ opacity: 0, x: 24 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.28, type: "spring", damping: 28, stiffness: 160 }}
-          className="gallery-panel"
-        >
-          <p className="gallery-panel-label">시각 자료 설명</p>
-          {p.id === "02" ? <JuhapFlowBoard /> : <ProjectVisual project={p} compact />}
-
-          <div className="gallery-panel__section">
-            <p className="gallery-panel-label gallery-panel-label--compact">기여 초점</p>
-            <ul className="gallery-list">
-              {p.contributions.map((contribution) => (
-                <li key={contribution} className="gallery-list__item">
-                  <span className="gallery-list__marker" aria-hidden="true">
-                    -
-                  </span>
-                  {contribution}
-                </li>
-              ))}
-            </ul>
+function WallIndex() {
+  return (
+    <div className="gallery-wall gallery-wall--index-figma">
+      <section className="gallery-index-section" data-node-id="170:1532">
+        <div className="gallery-index-section__copy">
+          <p className="gallery-index-section__eyebrow">01 / THE INDEX</p>
+          <h1 className="gallery-index-section__title">주합</h1>
+          <p className="gallery-index-section__summary">
+            정보의 양은 많지만 정작 '나에게 맞는 정답'을 찾지 못해 피로를 느끼는 소비자를 위해, 상황 기반 AI 추천과
+            유저 경험 데이터를 결합하여 '실패 없는 의사결정 도구'를 설계했습니다.
+          </p>
+          <div className="gallery-index-section__meta">
+            <div>
+              <p>DURATION</p>
+              <span>2026.04 - 2026.05</span>
+            </div>
+            <div>
+              <p>ROLE</p>
+              <span>PM, 기획</span>
+            </div>
+            <div className="gallery-index-section__tools">
+              <p>TOOLS</p>
+              <span>Figma, Gemini, Codex, Claude, Perplexity, VS Code, Git/GitHub</span>
+            </div>
           </div>
+        </div>
+        <div className="gallery-index-section__visual">
+          <div className="juhap-visual-card">
+            <div className="juhap-visual-card__topline">
+              <span>2026.04.22~2026.05.22(35일간 진행)</span>
+              <span>팀프로젝트 02_주합</span>
+            </div>
+            <div className="juhap-visual-card__phones">
+              <PhoneMock variant="front" />
+              <PhoneMock variant="back" />
+            </div>
+            <div className="juhap-visual-card__title">
+              <span>酒合</span>
+              <strong>주합</strong>
+              <p>실패 없는 주종 페어링 인공지능 챗봇</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
 
-          <div className="gallery-panel__section gallery-panel__section--bottom">
-            <p className="gallery-panel-label gallery-panel-label--compact">근거</p>
-            <div className="gallery-metric-grid">
-              {p.achievements.map((achievement) => (
-                <div key={achievement.label} className="gallery-metric">
-                  <p className="gallery-metric__value">{achievement.value}</p>
-                  <p className="gallery-metric__label">{achievement.label}</p>
+function WallObserver() {
+  return (
+    <div className="gallery-wall gallery-wall--observer-figma">
+      <section className="gallery-index-section gallery-index-section--observer">
+        <div className="gallery-index-section__copy">
+          <p className="gallery-index-section__eyebrow">02 / THE OBSERVER</p>
+          <h2 className="gallery-index-section__title">데이터 기반의 문제 정의 (Pain Point)</h2>
+          <p className="gallery-index-section__summary">
+            설문을 통해 사용자들의 주류 선택 피로와{" "}
+            <strong>실패 없는 추천 경험에 대한 니즈를 확인했어요</strong>
+          </p>
+          <div className="gallery-index-section__meta">
+            <div>
+              <p>DURATION</p>
+              <span>4/29~30까지 2일간</span>
+            </div>
+            <div>
+              <p>RESPONSE</p>
+              <span>87명</span>
+            </div>
+            <div className="gallery-index-section__tools">
+              <p>AND</p>
+              <span>
+                1인 가구 증가와 주말 혼술 트렌드 확산을 통해 '많이 마시는 시장'에서 '덜 실패하고 잘 고르는 시장'으로
+                이동하고 있음을 포착했습니다.
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="gallery-index-section__visual gallery-index-section__visual--observer">
+          <div className="observer-panel">
+          <div className="observer-chart-grid">
+            <article>
+              <h3>선택의 피로도</h3>
+              {[
+                ["광고성 리뷰인지 구분이 안 된다", "54%"],
+                ["정보과다로 뭘 봐야 할지 모르겠다", "27.6%"],
+                ["내 상황에 맞는 정보를 찾기 어렵다", "20.7%"],
+              ].map(([label, value]) => (
+                <div key={label} className="observer-bar">
+                  <span>{label}</span>
+                  <strong>{value}</strong>
                 </div>
               ))}
-            </div>
+            </article>
+            <article>
+              <h3>실패의 경험</h3>
+              {[
+                ["새로운 술에 도전하고 실망한 경험이 있다", "70%"],
+                ["그 외", "33.3%"],
+              ].map(([label, value]) => (
+                <div key={label} className="observer-bar">
+                  <span>{label}</span>
+                  <strong>{value}</strong>
+                </div>
+              ))}
+            </article>
           </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
-function Wall4({ p }: { p: Project }) {
-  return (
-    <div className="gallery-wall">
-      <WallLabel>04 - 상황 / 행동 / 결과</WallLabel>
-
-      <div className="gallery-sar">
-        <div className="gallery-sar__header">
-          {["상황", "진행한 일", "확인한 결과"].map((heading) => (
-            <div key={heading} className="gallery-sar__heading-cell">
-              <span>{heading}</span>
-            </div>
-          ))}
-        </div>
-
-        {p.sar.map((row, index) => (
-          <motion.div
-            key={`${row.s}-${index}`}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 + index * 0.1, type: "spring", damping: 28, stiffness: 180 }}
-            className="gallery-sar__row"
-          >
-            <div className="gallery-sar__cell">
-              <p className="gallery-body-copy">{row.s}</p>
-            </div>
-            <div className="gallery-sar__cell gallery-sar__cell--emphasis">
-              <p className="gallery-body-copy">{row.a}</p>
-            </div>
-            <div className="gallery-sar__cell gallery-sar__cell--emphasis">
-              <p className="gallery-result-copy">{row.r}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Wall5({ p, onExit }: { p: Project; onExit: () => void }) {
-  return (
-    <div className="gallery-wall">
-      <WallLabel>05 - 배운 점 / 공개 전 확인</WallLabel>
-
-      <div className="gallery-panel-grid gallery-panel-grid--two">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="gallery-panel"
-        >
-          <p className="gallery-panel-label">확인한 근거</p>
-          <div className="gallery-final-metrics">
-            {p.achievements.map((achievement) => (
-              <div key={achievement.label} className="gallery-final-metric">
-                <span className="gallery-final-metric__value">{achievement.value}</span>
-                <span className="gallery-final-metric__label">{achievement.label}</span>
+            <div className="observer-painpoints">
+            {[
+              ["01", "신뢰 부족"],
+              ["02", "결정 장애"],
+              ["03", "실패 경험"],
+            ].map(([num, label]) => (
+              <div key={num} className="observer-painpoint">
+                <div className="observer-painpoint__avatar" />
+                <span>PAIN POINT {num}</span>
+                <strong>{label}</strong>
               </div>
             ))}
-          </div>
-          {p.id === "02" && (
-            <div className="gallery-panel__section">
-              <p className="gallery-panel-label gallery-panel-label--compact">시각 자료 사용 기준</p>
-              <p className="gallery-body-copy">
-                발표 링크를 직접 열지 않고 로컬 테스트 화면과 이미지 자료를 기준으로 구성했습니다. 추천, 스캔,
-                챗봇, 질문 배너처럼 사용 흐름이 달라지는 화면만 골라 배치했습니다.
-              </p>
             </div>
-          )}
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.28, duration: 0.5 }}
-          className="gallery-panel"
-        >
-          <p className="gallery-panel-label">배운 점</p>
-          <blockquote className="gallery-reflection">"{p.takeaway}"</blockquote>
-
-          <div className="gallery-panel__section">
-            <p className="gallery-panel-label gallery-panel-label--compact">검증된 결과</p>
-            <p className="gallery-outcome">{p.result}</p>
-            <p className="gallery-panel-label gallery-panel-label--compact">공개 전 확인</p>
-            <ul className="gallery-list gallery-list--compact">
-              {p.confirmNeeded.map((item) => (
-                <li key={item} className="gallery-list__item">
-                  <span className="gallery-list__marker" aria-hidden="true">
-                    -
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <button className="gallery-return-button" type="button" onClick={onExit}>
-              목록으로 돌아가기
-            </button>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
 
-const WALLS = ["개요", "문제", "해결안", "SAR", "배운 점"] as const;
-const cubeFaces = ["front", "right", "back", "left", "return"] as const;
-const maxScrollIndex = WALLS.length - 1;
+function WallSolver() {
+  return (
+    <div className="gallery-wall gallery-wall--case-section">
+      <section className="gallery-case-grid gallery-case-grid--solver">
+        <div className="gallery-case-copy">
+          <p className="gallery-section-eyebrow">03 / THE SOLVER</p>
+          <h2>Structuring the void through precise material subtraction.</h2>
+        </div>
+        <div className="solver-panel">
+          <div className="solver-block">
+            <p className="gallery-section-eyebrow">AS-IS vs TO-BE</p>
+            <div className="solver-comparison">
+              <article>
+                <h3>AS-IS</h3>
+                <ul>
+                  <li>Cluttered navigation</li>
+                  <li>High cognitive load</li>
+                  <li>Intrusive tooltips</li>
+                </ul>
+              </article>
+              <article>
+                <h3>TO-BE</h3>
+                <ul>
+                  <li>Contextual, hidden UI</li>
+                  <li>Progressive disclosure</li>
+                  <li>Minimalist intervention</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+          <div className="solver-block">
+            <p className="gallery-section-eyebrow">INFORMATION ARCHITECTURE</p>
+            <div className="solver-ia">
+              <span>HOME</span>
+              <i />
+              <div>
+                <span>SPACE</span>
+                <span>OBJECT</span>
+                <span>SILENCE</span>
+              </div>
+            </div>
+          </div>
+          <div className="solver-block">
+            <p className="gallery-section-eyebrow">DESIGN SYSTEM COMPONENTS</p>
+            <div className="solver-components">
+              <span>TYPOGRAPHY</span>
+              <span>COLOR</span>
+              <span>GRID</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function WallProof() {
+  return (
+    <div className="gallery-wall gallery-wall--proof-figma">
+      <section className="proof-section">
+        <p className="gallery-section-eyebrow">04 / THE PROOF</p>
+        <strong>82.3%</strong>
+        <p>Increase in user preference for the minimalist structural approach compared to the legacy layout.</p>
+      </section>
+    </div>
+  );
+}
+
+function WallLog() {
+  return (
+    <div className="gallery-wall gallery-wall--log-figma">
+      <section className="log-section">
+        <p className="gallery-section-eyebrow">05 / THE LOG</p>
+        <h2>Reflections on empty space.</h2>
+        <p>
+          Designing for absence is inherently more complex than designing for presence. The process of stripping away
+          elements until only the essential structure remained taught me that true functionality often hides in plain sight.
+        </p>
+        <p>
+          My initial assumption was that users needed more guidance to navigate the vastness. The data proved otherwise.
+          They needed less noise to appreciate the scale. This project fundamentally shifted my approach from adding
+          features to refining structures.
+        </p>
+        <p>
+          The 1px line became my primary tool-not as a decoration, but as a load-bearing architectural element within the
+          digital space. It separates, defines, and guides without screaming for attention.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+function FallbackWall({ project, index }: { project: Project; index: number }) {
+  const sections = [
+    {
+      eyebrow: "01 / THE INDEX",
+      title: project.title,
+      body: project.summary,
+      meta: [`${project.year} / ${project.period}`, project.role, project.evidenceStatus],
+    },
+    {
+      eyebrow: "02 / THE OBSERVER",
+      title: "Problem",
+      body: project.problem,
+      meta: project.keyScreens,
+    },
+    {
+      eyebrow: "03 / THE SOLVER",
+      title: "Solution",
+      body: project.designSolution,
+      meta: project.contributions,
+    },
+    {
+      eyebrow: "04 / THE PROOF",
+      title: project.achievements[0]?.value ?? "Proof",
+      body: project.result,
+      meta: project.achievements.map((item) => `${item.value} ${item.label}`),
+    },
+    {
+      eyebrow: "05 / THE LOG",
+      title: "Reflection",
+      body: project.takeaway,
+      meta: project.confirmNeeded,
+    },
+  ];
+  const section = sections[index] ?? sections[0];
+
+  return (
+    <div className="gallery-wall gallery-wall--fallback">
+      <p className="gallery-fallback__eyebrow">{section.eyebrow}</p>
+      <h2 className="gallery-fallback__title">{section.title}</h2>
+      <p className="gallery-fallback__body">{section.body}</p>
+      <ul className="gallery-fallback__list">
+        {section.meta.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function getActiveScroller(faceRefs: React.MutableRefObject<(HTMLElement | null)[]>, wallIndex: number) {
+  return faceRefs.current[wallIndex]?.querySelector<HTMLElement>(".gallery-wall") ?? null;
+}
+
+function canScroll(scroller: HTMLElement | null, direction: "up" | "down") {
+  if (!scroller) return false;
+  const overflow = scroller.scrollHeight - scroller.clientHeight;
+  if (overflow <= 2) return false;
+  if (direction === "down") return scroller.scrollTop < overflow - 2;
+  return scroller.scrollTop > 2;
+}
+
+function isScrollable(scroller: HTMLElement | null) {
+  if (!scroller) return false;
+  return scroller.scrollHeight - scroller.clientHeight > 2;
+}
+
+function getScrollerProgress(scroller: HTMLElement | null) {
+  if (!scroller) return 0;
+  const overflow = scroller.scrollHeight - scroller.clientHeight;
+  if (overflow <= 2) return 0;
+  return Math.min(1, Math.max(0, scroller.scrollTop / overflow));
+}
 
 export function Gallery3D() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const project = PROJECTS.find((p) => p.id === id);
-
+  const project = PROJECTS.find((item) => item.id === id);
   const [wallIndex, setWallIndex] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [faceScrollProgress, setFaceScrollProgress] = useState(0);
+  const faceRefs = useRef<(HTMLElement | null)[]>([]);
+  const lastFaceScrollAtRef = useRef(0);
+  const isFigmaProject = project?.id === "02";
 
   const go = (nextIndex: number) => {
-    const targetIndex = Math.max(0, Math.min(maxScrollIndex, nextIndex));
-    const scroller = scrollRef.current;
-
-    if (!scroller) {
-      setWallIndex(targetIndex);
-      setScrollProgress(targetIndex);
-      return;
-    }
-
-    scroller.scrollTo({
-      top: targetIndex * scroller.clientHeight,
-      behavior: "smooth",
-    });
+    setWallIndex(Math.max(0, Math.min(MAX_WALL_INDEX, nextIndex)));
   };
 
   const prev = () => go(wallIndex - 1);
   const next = () => go(wallIndex + 1);
 
   useEffect(() => {
+    setWallIndex(0);
+  }, [id]);
+
+  useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight" || event.key === "ArrowDown") next();
-      if (event.key === "ArrowLeft" || event.key === "ArrowUp") prev();
-      if (event.key === "Escape") navigate("/");
+      const scroller = getActiveScroller(faceRefs, wallIndex);
+
+      if (event.key === "Escape") {
+        navigate("/");
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        prev();
+        return;
+      }
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        next();
+        return;
+      }
+
+      if (event.key === "ArrowDown" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        if (canScroll(scroller, "down")) {
+          scroller?.scrollBy({ top: Math.max(180, scroller.clientHeight * 0.78), behavior: "smooth" });
+        } else {
+          next();
+        }
+        return;
+      }
+
+      if (event.key === "ArrowUp" || event.key === "PageUp") {
+        event.preventDefault();
+        if (canScroll(scroller, "up")) {
+          scroller?.scrollBy({ top: -Math.max(180, scroller.clientHeight * 0.78), behavior: "smooth" });
+        } else {
+          prev();
+        }
+      }
     };
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [wallIndex, navigate]);
 
-  const handleScroll = () => {
-    const scroller = scrollRef.current;
+  useEffect(() => {
+    const scroller = getActiveScroller(faceRefs, wallIndex);
+    scroller?.scrollTo({ top: 0, behavior: "auto" });
+    setFaceScrollProgress(0);
+    lastFaceScrollAtRef.current = performance.now();
+  }, [wallIndex]);
+
+  useEffect(() => {
+    const scroller = getActiveScroller(faceRefs, wallIndex);
     if (!scroller) return;
 
-    const progress = Math.min(maxScrollIndex, Math.max(0, scroller.scrollTop / scroller.clientHeight));
-    setScrollProgress(progress);
-    setWallIndex(Math.round(progress));
+    const syncProgress = () => setFaceScrollProgress(getScrollerProgress(scroller));
+    syncProgress();
+    scroller.addEventListener("scroll", syncProgress, { passive: true });
+    return () => scroller.removeEventListener("scroll", syncProgress);
+  }, [wallIndex]);
+
+  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
+    if (Math.abs(event.deltaY) < 2) return;
+
+    const scroller = getActiveScroller(faceRefs, wallIndex);
+    const direction = event.deltaY > 0 ? "down" : "up";
+    event.preventDefault();
+
+    if (canScroll(scroller, direction)) {
+      scroller?.scrollBy({ top: event.deltaY, behavior: "auto" });
+      lastFaceScrollAtRef.current = performance.now();
+      return;
+    }
+
+    if (isScrollable(scroller) && performance.now() - lastFaceScrollAtRef.current < FACE_EDGE_SETTLE_MS) {
+      return;
+    }
+
+    if (direction === "down") next();
+    else prev();
   };
 
   if (!project) {
@@ -546,47 +526,62 @@ export function Gallery3D() {
     );
   }
 
+  const renderWall = (index: number) => {
+    if (!isFigmaProject) {
+      return <FallbackWall project={project} index={index} />;
+    }
+
+    if (index === 0) return <WallIndexFigma230 />;
+    if (index === 1) return <WallObserver />;
+    if (index === 2) return <WallSolver />;
+    if (index === 3) return <WallProof />;
+    return <WallLog />;
+  };
+
+  const overallScrollProgress =
+    MAX_WALL_INDEX === 0 ? 1 : Math.min(1, Math.max(0, (wallIndex + faceScrollProgress) / MAX_WALL_INDEX));
+  const bottombarStyle = {
+    "--gallery-scroll-progress": `${overallScrollProgress * 100}%`,
+  } as CSSProperties;
+
   return (
     <motion.div
       className="gallery-3d"
       initial={{ opacity: 0, scale: 0.985 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.42, ease: [0.25, 1, 0.5, 1] }}
+      onWheel={handleWheel}
     >
       <div className="gallery-topbar">
-        <div className="gallery-topbar__left">
-          <button type="button" onClick={() => navigate("/")} className="gallery-breadcrumb-button">
-            포트폴리오
-          </button>
-          <span className="gallery-topbar__separator" aria-hidden="true">
-            |
-          </span>
+        <button type="button" onClick={() => navigate("/")} className="gallery-breadcrumb-button">
+          PORTFOLIO
+        </button>
+        <div className="gallery-topbar__title-group">
           <span className="gallery-topbar__title">{project.title}</span>
-          <span className="gallery-topbar__subtitle">- {project.subtitle}</span>
+          <span className="gallery-topbar__subtitle">{project.subtitle}</span>
         </div>
-
         <div className="gallery-topbar__right">
           <div className="gallery-wall-dots" aria-label="Project wall navigation">
-            {WALLS.map((wall, index) => (
+            {FALLBACK_LABELS.map((wall, index) => (
               <button
                 key={wall}
                 type="button"
                 onClick={() => go(index)}
                 className={`gallery-wall-dot${index === wallIndex ? " is-active" : ""}`}
-                aria-label={`${wall} 벽으로 이동`}
+                aria-label={`${wall} wall`}
                 aria-current={index === wallIndex ? "step" : undefined}
               />
             ))}
           </div>
           <span className="gallery-wall-count">
-            {wallIndex + 1} / {WALLS.length}
+            {wallIndex + 1} / {FALLBACK_LABELS.length}
           </span>
           <div className="gallery-step-controls">
             <button type="button" onClick={prev} disabled={wallIndex === 0} className="gallery-step-button">
-              이전
+              PREV
             </button>
-            <button type="button" onClick={next} disabled={wallIndex === WALLS.length - 1} className="gallery-step-button">
-              다음
+            <button type="button" onClick={next} disabled={wallIndex === MAX_WALL_INDEX} className="gallery-step-button">
+              NEXT
             </button>
           </div>
         </div>
@@ -595,46 +590,38 @@ export function Gallery3D() {
       <div className="gallery-stage">
         <div className="gallery-face-caption" aria-hidden="true">
           <span className="gallery-face-caption__number">{String(wallIndex + 1).padStart(2, "0")}</span>
-          <span className="gallery-face-caption__name">{WALLS[wallIndex]}</span>
+          <span className="gallery-face-caption__name">{FALLBACK_LABELS[wallIndex]}</span>
         </div>
 
-        <div className="gallery-cube-scene">
-          <motion.div
-            className="gallery-cube"
-            animate={{
-              rotateY: -scrollProgress * 90,
-              z: Math.sin(scrollProgress * Math.PI) * 24,
-            }}
-            transition={{ type: "spring", damping: 36, stiffness: 150 }}
-          >
-            {cubeFaces.map((face, index) => (
-              <section
-                key={face}
-                className={`gallery-cube__face gallery-cube__face--${face}`}
-                aria-hidden={index !== wallIndex}
-              >
-                {index === 0 && <Wall1 p={project} />}
-                {index === 1 && <Wall2 p={project} />}
-                {index === 2 && <Wall3 p={project} />}
-                {index === 3 && <Wall4 p={project} />}
-                {index === 4 && <Wall5 p={project} onExit={() => navigate("/")} />}
-              </section>
-            ))}
-          </motion.div>
-        </div>
+        <motion.div
+          className="gallery-cube"
+          animate={{
+            rotateY: -wallIndex * 90,
+            z: wallIndex === 0 || wallIndex === MAX_WALL_INDEX ? 0 : 24,
+          }}
+          transition={{ type: "spring", damping: 36, stiffness: 150 }}
+        >
+          {CUBE_FACES.map((face, index) => (
+            <section
+              key={face}
+              ref={(node) => {
+                faceRefs.current[index] = node;
+              }}
+              className={`gallery-cube__face gallery-cube__face--${face}`}
+              data-active={index === wallIndex ? "true" : "false"}
+              aria-hidden={index !== wallIndex}
+            >
+              {renderWall(index)}
+            </section>
+          ))}
+        </motion.div>
       </div>
 
-      <div className="gallery-bottombar">
+      <div className="gallery-bottombar" style={bottombarStyle}>
         <span>
-          Wall {wallIndex + 1} - {WALLS[wallIndex]}
+          Wall {wallIndex + 1} - {FALLBACK_LABELS[wallIndex]}
         </span>
-        <span>스크롤로 전시 벽 이동 - Esc로 나가기</span>
-      </div>
-
-      <div ref={scrollRef} className="gallery-scroll-driver" onScroll={handleScroll} aria-label="프로젝트 상세 섹션 스크롤">
-        {WALLS.map((wall, index) => (
-          <section key={wall} className="gallery-scroll-section" aria-label={`${index + 1}. ${wall}`} />
-        ))}
+        <span>Scroll the current face to the end, then the cube turns to the next face.</span>
       </div>
     </motion.div>
   );
