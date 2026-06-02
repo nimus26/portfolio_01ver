@@ -30,6 +30,7 @@ const JUHAP_LABELS = ["THE INDEX", "THE OBSERVER", "THE SOLVER", "ADDITIONAL", "
 const KIA_LABELS = ["THE INDEX", "THE OBSERVER", "THE SOLVER", "THE RE-DESIGN", "THE LOG"] as const;
 const FALLBACK_CUBE_FACES = ["front", "right", "back", "left", "return"] as const;
 const JUHAP_CUBE_FACES = ["front", "right", "back", "left", "return", "extra"] as const;
+const DETAIL_PROJECT_ORDER = ["02", "03", "01"] as const;
 const MIN_FACE_SCROLL_OVERFLOW = 24;
 const SCROLL_EDGE_THRESHOLD = 2;
 
@@ -798,6 +799,7 @@ export function Gallery3D() {
   const project = PROJECTS.find((item) => item.id === id);
   const [wallIndex, setWallIndex] = useState(0);
   const [faceScrollProgress, setFaceScrollProgress] = useState(0);
+  const [isEndOverlayOpen, setIsEndOverlayOpen] = useState(false);
   const galleryRef = useRef<HTMLDivElement | null>(null);
   const faceRefs = useRef<(HTMLElement | null)[]>([]);
   const isJuhapProject = project?.id === "02";
@@ -808,15 +810,27 @@ export function Gallery3D() {
 
   const go = (nextIndex: number) => {
     const clampedIndex = Math.max(0, Math.min(maxWallIndex, nextIndex));
+    setIsEndOverlayOpen(false);
     setWallIndex(clampedIndex);
   };
 
   const prev = () => go(wallIndex - 1);
   const next = () => go(wallIndex + 1);
   const backToCatalogue = () => navigate({ pathname: "/", hash: "#room-03-catalogue" });
+  const openEndOverlay = () => setIsEndOverlayOpen(true);
+  const goToNextProject = () => {
+    const currentOrderIndex = DETAIL_PROJECT_ORDER.findIndex((projectId) => projectId === id);
+    const nextProjectId =
+      currentOrderIndex >= 0
+        ? DETAIL_PROJECT_ORDER[(currentOrderIndex + 1) % DETAIL_PROJECT_ORDER.length]
+        : DETAIL_PROJECT_ORDER.find((projectId) => projectId !== id) ?? DETAIL_PROJECT_ORDER[0];
+
+    navigate(`/project/${nextProjectId}`);
+  };
 
   useEffect(() => {
     setWallIndex(0);
+    setIsEndOverlayOpen(false);
   }, [id]);
 
   useEffect(() => {
@@ -824,6 +838,11 @@ export function Gallery3D() {
       const scroller = getActiveScroller(faceRefs, wallIndex);
 
       if (event.key === "Escape") {
+        if (isEndOverlayOpen) {
+          setIsEndOverlayOpen(false);
+          return;
+        }
+
         navigate("/");
         return;
       }
@@ -844,6 +863,8 @@ export function Gallery3D() {
         event.preventDefault();
         if (canScroll(scroller, "down")) {
           scroller?.scrollBy({ top: Math.max(180, scroller.clientHeight * 0.78), behavior: "smooth" });
+        } else if (wallIndex === maxWallIndex) {
+          openEndOverlay();
         } else {
           next();
         }
@@ -862,7 +883,7 @@ export function Gallery3D() {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [wallIndex, navigate, maxWallIndex]);
+  }, [wallIndex, navigate, maxWallIndex, isEndOverlayOpen]);
 
   useEffect(() => {
     const scroller = getActiveScroller(faceRefs, wallIndex);
@@ -893,6 +914,11 @@ export function Gallery3D() {
       if (canScroll(scroller, direction)) return;
 
       event.preventDefault();
+      if (direction === "down" && wallIndex === maxWallIndex) {
+        openEndOverlay();
+        return;
+      }
+
       const nextWallIndex = direction === "down" ? Math.min(maxWallIndex, wallIndex + 1) : Math.max(0, wallIndex - 1);
       setWallIndex(nextWallIndex);
     };
@@ -1027,6 +1053,38 @@ export function Gallery3D() {
         </span>
         <span>Scroll the current face to the end, then the cube turns to the next face.</span>
       </div>
+      {isEndOverlayOpen ? (
+        <motion.div
+          className="gallery-end-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="gallery-end-overlay__panel" role="dialog" aria-modal="true" aria-label="프로젝트 탐색">
+            <button
+              type="button"
+              className="gallery-end-overlay__close"
+              onClick={() => setIsEndOverlayOpen(false)}
+              aria-label="모달 닫기"
+            >
+              닫기
+            </button>
+            <span className="gallery-end-overlay__eyebrow">END OF PROJECT</span>
+            <h2>다음으로 이동</h2>
+            <div className="gallery-end-overlay__actions">
+              <button type="button" onClick={() => go(0)}>
+                처음으로
+              </button>
+              <button type="button" onClick={goToNextProject}>
+                다른 프로젝트
+              </button>
+              <button type="button" onClick={backToCatalogue}>
+                카탈로그
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      ) : null}
       {isJuhapProject ? <JuhapFloatingLinks onBackToCatalogue={backToCatalogue} /> : null}
       {isKiaProject ? <KiaFloatingLinks onBackToCatalogue={backToCatalogue} /> : null}
     </motion.div>
