@@ -14,13 +14,13 @@ import faceFeel from "../../asset/case-studies/face_feel.png";
 import faceReady from "../../asset/case-studies/face_ready.png";
 import faceZero from "../../asset/case-studies/face_zero.png";
 import kiaMainVisual from "../../asset/case-studies/kia-detail/main_visual.png";
+import kiaQrOn from "../../asset/case-studies/kia-detail/qr_on.png";
 import proofBefore from "../../asset/case-studies/figma-parts/proof-before.png";
 import proofAfter from "../../asset/case-studies/figma-parts/proof-after.png";
 import proofResponsive from "../../asset/case-studies/figma-parts/proof-responsive.png";
 import logLaptopMain from "../../asset/case-studies/figma-parts/log-laptop-main.png";
 import logLaptopScreen from "../../asset/case-studies/figma-parts/log-laptop-screen.png";
 import logLaptopShadow from "../../asset/case-studies/figma-parts/log-laptop-shadow.png";
-import logScanIcon from "../../asset/case-studies/figma-parts/log-scan-icon.png";
 import { PROJECTS, type Project } from "../data/projects";
 import "./Gallery3D.css";
 
@@ -623,7 +623,7 @@ function JuhapContributionChart() {
   );
 }
 
-function JuhapFloatingLinks() {
+function JuhapFloatingLinks({ onBackToCatalogue }: { onBackToCatalogue: () => void }) {
   return (
     <aside className="juhap-floating-links" aria-label="주합 결과물 링크">
       <span className="juhap-floating-links__scan" aria-hidden="true">
@@ -637,6 +637,9 @@ function JuhapFloatingLinks() {
         <a className="juhap-floating-links__button juhap-floating-links__button--solid" href="https://www.figma.com/deck/6F2y35iFJ7uGEduC7zrVuz" target="_blank" rel="noreferrer">
           결과보고서 보기
         </a>
+        <button type="button" className="juhap-floating-links__button juhap-floating-links__button--catalogue" onClick={onBackToCatalogue}>
+          카탈로그 보기
+        </button>
       </div>
     </aside>
   );
@@ -709,7 +712,10 @@ function KiaWallLog() {
 function KiaFloatingLinks({ onBackToCatalogue }: { onBackToCatalogue: () => void }) {
   return (
     <aside className="log-section__links log-section__links--floating" aria-label="기아 결과물 링크">
-      <div className="log-scan-button"><img src={logScanIcon} alt="" aria-hidden="true" /></div>
+      <div className="log-scan-button">
+        <span className="log-scan-button__icon" aria-hidden="true" />
+        <img className="log-scan-button__qr" src={kiaQrOn} alt="" aria-hidden="true" />
+      </div>
       <a href="https://new-kia.vercel.app/" target="_blank" rel="noreferrer">웹에서 바로보기</a>
       <a href="https://www.figma.com/deck/THUxI79jNPT1MSIt8zNSD2" target="_blank" rel="noreferrer">결과보고서 보기</a>
       <button type="button" className="log-section__catalogue-button" onClick={onBackToCatalogue}>카탈로그 보기</button>
@@ -800,7 +806,8 @@ export function Gallery3D() {
   const maxWallIndex = wallLabels.length - 1;
 
   const go = (nextIndex: number) => {
-    setWallIndex(Math.max(0, Math.min(maxWallIndex, nextIndex)));
+    const clampedIndex = Math.max(0, Math.min(maxWallIndex, nextIndex));
+    setWallIndex(clampedIndex);
   };
 
   const prev = () => go(wallIndex - 1);
@@ -885,10 +892,8 @@ export function Gallery3D() {
       if (canScroll(scroller, direction)) return;
 
       event.preventDefault();
-      setWallIndex((current) => {
-        if (direction === "down") return Math.min(maxWallIndex, current + 1);
-        return Math.max(0, current - 1);
-      });
+      const nextWallIndex = direction === "down" ? Math.min(maxWallIndex, wallIndex + 1) : Math.max(0, wallIndex - 1);
+      setWallIndex(nextWallIndex);
     };
 
     gallery.addEventListener("wheel", onWheel, { passive: false });
@@ -1015,7 +1020,7 @@ export function Gallery3D() {
         </span>
         <span>Scroll the current face to the end, then the cube turns to the next face.</span>
       </div>
-      {isJuhapProject ? <JuhapFloatingLinks /> : null}
+      {isJuhapProject ? <JuhapFloatingLinks onBackToCatalogue={backToCatalogue} /> : null}
       {isKiaProject ? <KiaFloatingLinks onBackToCatalogue={backToCatalogue} /> : null}
     </motion.div>
   );
