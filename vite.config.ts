@@ -3,6 +3,8 @@ import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
+const isGitHubPages = process.env.GITHUB_PAGES === 'true'
+
 function figmaAssetResolver() {
   return {
     name: 'figma-asset-resolver',
@@ -16,6 +18,7 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
+  base: isGitHubPages ? '/portfolio_01ver/' : '/',
   plugins: [
     figmaAssetResolver(),
     react(),
