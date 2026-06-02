@@ -25,6 +25,7 @@ const PROJECT_IMAGES: Record<string, { back: string; pamphlet: string; front: st
 };
 
 const CATALOGUE_PROJECT_ORDER = ["02", "03", "01", "04"] as const;
+const DISABLED_CATALOGUE_PROJECT_IDS = new Set(["04"]);
 
 const RESTING_Y = 12;
 const HOVER_Y = -42;
@@ -38,6 +39,7 @@ function PamphletCard({ project, displayIndex }: { project: Project; displayInde
   const navigateTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
   const navigate = useNavigate();
   const imgs = PROJECT_IMAGES[project.id];
+  const isDisabled = DISABLED_CATALOGUE_PROJECT_IDS.has(project.id);
   const isActive = hovered || opening;
 
   useEffect(() => {
@@ -48,6 +50,7 @@ function PamphletCard({ project, displayIndex }: { project: Project; displayInde
   }, []);
 
   const openProject = () => {
+    if (isDisabled) return;
     if (opening) return;
 
     setHovered(true);
@@ -59,22 +62,28 @@ function PamphletCard({ project, displayIndex }: { project: Project; displayInde
   };
 
   return (
-    <article className="catalogue-case-card">
+    <article className={`catalogue-case-card${isDisabled ? " is-disabled" : ""}`}>
       <motion.div
         className={`pamphlet-card${opening ? " is-opening" : ""}`}
-        onMouseEnter={() => setHovered(true)}
+        onMouseEnter={() => {
+          if (!isDisabled) setHovered(true);
+        }}
         onMouseLeave={() => {
           if (!opening) setHovered(false);
         }}
-        onFocus={() => setHovered(true)}
+        onFocus={() => {
+          if (!isDisabled) setHovered(true);
+        }}
         onBlur={() => {
           if (!opening) setHovered(false);
         }}
         onClick={openProject}
-        role="button"
-        tabIndex={0}
+        role={isDisabled ? "presentation" : "button"}
+        tabIndex={isDisabled ? -1 : 0}
+        aria-disabled={isDisabled ? true : undefined}
       aria-label={`${project.title} 상세 전시 보기`}
         onKeyDown={(e) => {
+          if (isDisabled) return;
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             openProject();
@@ -132,7 +141,7 @@ function PamphletCard({ project, displayIndex }: { project: Project; displayInde
         </div>
       </motion.div>
 
-      <button type="button" className="catalogue-case-card__caption" onClick={openProject}>
+      <button type="button" className="catalogue-case-card__caption" onClick={openProject} disabled={isDisabled}>
         <span className="catalogue-case-card__room">Room {String(displayIndex).padStart(2, "0")} / {project.roomTitle}</span>
         <span className="catalogue-case-card__title">{project.title}</span>
         <span className="catalogue-case-card__meta">{project.type} - {project.period} - {project.role}</span>

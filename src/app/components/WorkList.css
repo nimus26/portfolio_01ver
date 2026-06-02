@@ -122,6 +122,21 @@
   padding: var(--space-8) var(--space-6) var(--space-10);
 }
 
+.catalogue-case-card.is-disabled {
+  opacity: 0.42;
+}
+
+.catalogue-case-card.is-disabled .pamphlet-card,
+.catalogue-case-card.is-disabled .catalogue-case-card__caption {
+  cursor: default;
+  pointer-events: none;
+}
+
+.catalogue-case-card.is-disabled .pamphlet-card__image,
+.catalogue-case-card.is-disabled .pamphlet-card__sheet {
+  filter: grayscale(1);
+}
+
 .catalogue-case-card__caption {
   appearance: none;
   display: flex;
