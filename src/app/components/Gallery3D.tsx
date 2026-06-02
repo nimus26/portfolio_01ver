@@ -13,6 +13,7 @@ import juhapRankingPhone from "../../asset/case-studies/juhap-detail/juhap-ranki
 import faceFeel from "../../asset/case-studies/face_feel.png";
 import faceReady from "../../asset/case-studies/face_ready.png";
 import faceZero from "../../asset/case-studies/face_zero.png";
+import kiaLogo from "../../asset/case-studies/kia-detail/logo.png";
 import kiaMainVisual from "../../asset/case-studies/kia-detail/main_visual.png";
 import kiaQrOn from "../../asset/case-studies/kia-detail/qr_on.png";
 import proofBefore from "../../asset/case-studies/figma-parts/proof-before.png";
@@ -953,7 +954,13 @@ export function Gallery3D() {
         </button>
         <div className="gallery-topbar__title-group">
           <span className="gallery-topbar__title">
-            {isJuhapProject ? <img className="gallery-topbar__logo" src={juhapLogoBl} alt="주합" /> : project.title}
+            {isJuhapProject ? (
+              <img className="gallery-topbar__logo" src={juhapLogoBl} alt="주합" />
+            ) : isKiaProject ? (
+              <img className="gallery-topbar__logo gallery-topbar__logo--kia" src={kiaLogo} alt="KIA" />
+            ) : (
+              project.title
+            )}
           </span>
           <span className="gallery-topbar__subtitle">{project.subtitle}</span>
         </div>

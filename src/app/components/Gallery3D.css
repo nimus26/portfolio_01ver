@@ -138,6 +138,10 @@
   height: 28px;
 }
 
+.gallery-topbar__logo--kia {
+  height: 22px;
+}
+
 .gallery-topbar__subtitle {
   overflow: hidden;
   color: #727176;
