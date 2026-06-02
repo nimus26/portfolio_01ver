@@ -1275,59 +1275,219 @@
 }
 
 .gallery-wall--proof-figma .proof-section:not(.proof-section--redesign) {
+  --proof-donut-size: clamp(126px, 24svh, 244px);
+  --proof-value-size: clamp(52px, 8.4svh, 88px);
+  --proof-card-gap: clamp(6px, 1.4svh, 12px);
+  --proof-section-gap: clamp(8px, 1.8svh, 18px);
   box-sizing: border-box;
   height: 100%;
   min-height: 0;
-  padding: 24px 0 36px;
-  gap: 18px;
+  margin: 0 auto;
+  justify-content: flex-start;
+  padding: clamp(6px, 1.4svh, 12px) 0 clamp(10px, 2svh, 24px);
+  gap: var(--proof-section-gap);
 }
 
 .gallery-wall--proof-figma
   .proof-section:not(.proof-section--redesign)
   .proof-section__intro {
-  gap: 12px;
+  gap: clamp(6px, 1.2svh, 12px);
 }
 
 .gallery-wall--proof-figma
   .proof-section:not(.proof-section--redesign)
   .proof-section__intro
   h2 {
-  font-size: 32px;
-  line-height: 1.22;
+  font-size: clamp(22px, 3.4svh, 32px);
+  line-height: 1.18;
 }
 
 .gallery-wall--proof-figma
   .proof-section:not(.proof-section--redesign)
   .proof-section__intro
   p:not(.gallery-section-eyebrow) {
-  font-size: 16px;
-  line-height: 1.42;
+  font-size: clamp(13px, 1.8svh, 16px);
+  line-height: 1.34;
 }
 
 .gallery-wall--proof-figma
   .proof-section:not(.proof-section--redesign)
   .proof-section__meta {
-  padding-top: 12px;
+  padding-top: clamp(6px, 1.2svh, 12px);
 }
 
 .gallery-wall--proof-figma
   .proof-section:not(.proof-section--redesign)
   .proof-outcome-grid {
-  padding-top: 12px;
-  gap: 56px;
+  padding-top: clamp(4px, 1svh, 12px);
+  gap: clamp(24px, 4vw, 56px);
 }
 
 .gallery-wall--proof-figma
   .proof-section:not(.proof-section--redesign)
   .proof-outcome-card {
-  gap: 12px;
+  gap: var(--proof-card-gap);
 }
 
 .gallery-wall--proof-figma
   .proof-section:not(.proof-section--redesign)
   .proof-outcome-card__quote {
-  min-height: 50px;
-  font-size: 21px;
+  min-height: clamp(32px, 5.4svh, 50px);
+  font-size: clamp(14px, 2.4svh, 21px);
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-outcome-card__badge {
+  min-height: clamp(28px, 4.8svh, 43.333px);
+  padding-inline: clamp(14px, 2vw, 22.333px);
+  font-size: clamp(12px, 1.8svh, 16px);
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-outcome-card__graph {
+  width: min(100%, calc(var(--proof-donut-size) + clamp(112px, 18vw, 228px)));
+  height: var(--proof-donut-size);
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-outcome-card__value {
+  font-size: var(--proof-value-size);
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut {
+  flex-basis: var(--proof-donut-size);
+  width: var(--proof-donut-size);
+  height: var(--proof-donut-size);
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut::before {
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut__hole {
+  top: 35.6%;
+  left: 35.6%;
+  width: 28.8%;
+  height: 28.8%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut__label {
+  font-size: clamp(10px, 1.8svh, 16px);
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut__label
+  strong {
+  font-size: clamp(12px, 2.2svh, 20px);
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut__label--top-left {
+  top: 2%;
+  left: -9%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut__label--right {
+  top: 26%;
+  left: 95%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut__label--bottom-right {
+  top: 77%;
+  left: 80%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut--validity
+  .proof-donut__label--top-left {
+  top: 7%;
+  left: -26%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut--validity
+  .proof-donut__label--right {
+  top: 19%;
+  left: 95%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut--validity
+  .proof-donut__label--bottom-right {
+  top: 76%;
+  left: 73%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut__line--top-left {
+  top: 29.5%;
+  left: 30.3%;
+  width: 15%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut__line--right {
+  top: 46.5%;
+  left: 78.8%;
+  width: 14.5%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut__line--bottom-right {
+  top: 77%;
+  left: 69%;
+  width: 12%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut--validity
+  .proof-donut__line--top-left {
+  top: 36%;
+  left: 21%;
+  width: 15%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut--validity
+  .proof-donut__line--right {
+  top: 39%;
+  left: 78.8%;
+}
+
+.gallery-wall--proof-figma
+  .proof-section:not(.proof-section--redesign)
+  .proof-donut--validity
+  .proof-donut__line--bottom-right {
+  top: 80%;
+  left: 59%;
 }
 
 .proof-section__intro {
