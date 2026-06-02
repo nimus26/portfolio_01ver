@@ -8,6 +8,7 @@ import juhapHomePhone from "../../asset/case-studies/juhap-detail/juhap-home-pho
 import juhapLogoBl from "../../asset/case-studies/juhap-detail/juhap_logo_bl.png";
 import juhapMainVisual from "../../asset/case-studies/juhap-detail/main.png";
 import juhapOnboardingVideo from "../../asset/case-studies/juhap-detail/onboarding.mp4";
+import juhapQrOn from "../../asset/case-studies/juhap-detail/qr_on.png";
 import juhapRankingPhone from "../../asset/case-studies/juhap-detail/juhap-ranking-phone.png";
 import faceFeel from "../../asset/case-studies/face_feel.png";
 import faceReady from "../../asset/case-studies/face_ready.png";
@@ -627,6 +628,7 @@ function JuhapFloatingLinks() {
     <aside className="juhap-floating-links" aria-label="주합 결과물 링크">
       <span className="juhap-floating-links__scan" aria-hidden="true">
         <span />
+        <img src={juhapQrOn} alt="" />
       </span>
       <div className="juhap-floating-links__buttons">
         <a className="juhap-floating-links__button juhap-floating-links__button--light" href="https://juhap-nmuh.vercel.app" target="_blank" rel="noreferrer">
