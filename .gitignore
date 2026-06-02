@@ -43,3 +43,15 @@ coverage/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local agent/tooling notes
+AGENTS.md
+RUN_CONTEXT.md
+.claude/
+.codex-*.log
+vite-*.log
+
+# Local design scratch files
+figma-detail-board.html
+guidelines/
+default_shadcn_theme.css
